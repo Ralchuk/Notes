@@ -5,7 +5,7 @@ type Prop = {
 };
 
 
-export default function FormNote ( {onCreate}: Prop) {
+export default function Form ( {onCreate}: Prop) {
     const [title,setTitle] = useState('');
     const [text, setText] = useState('');
     function handleSubmit(e: React.FormEvent<HTMLFormElement>){
