@@ -4,3 +4,11 @@ export interface Note {
   content: string;
   createdAt: Date;
 }
+
+export type PropForm = {
+    title: string,
+    text: string,
+    setTitle: (value: string) => void,
+    setText: (value: string) => void,
+    onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void,
+};

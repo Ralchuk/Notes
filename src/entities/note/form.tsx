@@ -1,10 +1,4 @@
-type PropForm = {
-    title: string,
-    text: string,
-    setTitle: (value: string) => void,
-    setText: (value: string) => void,
-    onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void,
-};
+import { type PropForm } from "./model/types";
 
 export default function Form ({title, text, setTitle, setText, onSubmit}: PropForm ) {
     return (
