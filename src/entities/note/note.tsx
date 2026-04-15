@@ -96,6 +96,5 @@ export default function Note(){
             </div> }
       </div>
     </div>
-        
   )
 }
