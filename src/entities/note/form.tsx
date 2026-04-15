@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from 'react';
 
 type Prop = {
   onCreate: (title: string, text: string) => void;
@@ -8,14 +8,14 @@ type Prop = {
 export default function Form ( {onCreate}: Prop) {
     const [title,setTitle] = useState('');
     const [text, setText] = useState('');
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>){
-        e.preventDefault
+    function handleSubmit(e: React.SubmitEvent<HTMLFormElement>){
+        e.preventDefault();
 
-        if (!title.trim() || !text.trim()) return
+        if (!title.trim() || !text.trim()) return;
 
-        onCreate(title,text)
-        setText('')
-        setTitle('')
+        onCreate(title,text);
+        setText('');
+        setTitle('');
     }
     return (
         <div >
