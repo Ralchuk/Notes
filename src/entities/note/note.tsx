@@ -9,7 +9,7 @@ const headerNoteBtn = 'flex flex-row gap-[10px]';
 const btnCreate = 'flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
 const btnClear = 'flex uppercase px-6 py-2 text-[#1976d3] bg-white border-[1px] border-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:border-[#1976d3]/50 hover:text-[#1976d3]/50 cursor-pointer';
 const formContainer = 'flex flex-col gap-[10px] w-full';
-const btnClose = 'flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer'
+const btnClose = 'flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
 const arrContainer = 'flex flex-col gap-[20px] px-[20px] w-full';
 const itemNote = 'border-y-[1px] border-[#1976d3]/50';
 const itemNoteTitle = 'text-[#1976d3] text-[32px] font-[Roboto, sans-serif]';
@@ -18,7 +18,7 @@ const itemNoteDate = 'text-black/25 text-[12px] font-[Roboto, sans-serif] font-b
 const arrEmpty = 'flex flex-col items-center opacity-50';
 
 export default function Note(){
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
   const [note, setNote] = useState<Note[]>([]);
   const [title,setTitle] = useState('');
   const [text, setText] = useState('');
@@ -35,17 +35,17 @@ export default function Note(){
   }
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>){
-      e.preventDefault();
+    e.preventDefault();
 
-      if (!title.trim() || !text.trim()) return;
+    if (!title.trim() || !text.trim()) return;
 
-      onCreate(title,text);
-      setText('');
-      setTitle('');
+    onCreate(title,text);
+    setText('');
+    setTitle('');
   }
 
   function handleCleanNotes(){
-    setNote([])
+    setNote([]);
   }
 
   function handleClearForm(){
@@ -66,7 +66,7 @@ export default function Note(){
               <button className={btnClose} onClick={() => setIsOpen(false)}>Close</button>
             </div>
           </div>
-           : 
+          : 
           <div className={headerNote}>
             <div className={headerNoteBtn}>
               <button className={btnCreate} onClick={() => setIsOpen(true)}>Create</button>
@@ -83,18 +83,18 @@ export default function Note(){
             <h3 className={itemNoteDate}>{item.createdAt.toLocaleString()}</h3>
           </div>
         )) : <div className={arrEmpty} >
-              <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-                <path
-                  d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
-                  stroke="black"
-                  strokeWidth="1.5"
-                />
-                <path d="M9 12h6M9 16h4" stroke="black" strokeWidth="1.5" />
-              </svg>
-              <p>No notes yet</p>
-              <small>Click "Create" to add your first note</small>
-            </div> }
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
+              stroke="black"
+              strokeWidth="1.5"
+            />
+            <path d="M9 12h6M9 16h4" stroke="black" strokeWidth="1.5" />
+          </svg>
+          <p>No notes yet</p>
+          <small>Click "Create" to add your first note</small>
+        </div> }
       </div>
     </div>
-  )
+  );
 }

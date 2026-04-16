@@ -1,11 +1,11 @@
-import Note from "@/entities/note/note";
+import Note from '@/entities/note/note';
 
 
 function App() {
   
   return (
     <>
-    <Note/>
+      <Note/>
     </>
   );
 }
