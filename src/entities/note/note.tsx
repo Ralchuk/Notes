@@ -1,8 +1,9 @@
 import  Form from '@/entities/note/form';
+import ContextMenu from './contextMenu';
 import { type Note } from './model/types';
 import { useState } from 'react';
 
-const container = 'flex flex-col items-center';
+const container = 'flex flex-col items-center w-full min-h-screen';
 const noteContainer = 'flex flex-col  pt-[10px] pb-[30px] gap-[15px] w-fit';
 const headerNote = 'flex flex-col items-center gap-[15px] w-[350px]';
 const headerNoteBtn = 'flex flex-row gap-[10px]';
@@ -22,6 +23,11 @@ export default function Note(){
   const [note, setNote] = useState<Note[]>([]);
   const [title,setTitle] = useState('');
   const [text, setText] = useState('');
+
+  // states for contextMenu
+  const [isOpenMenu, setIsOpenMenu] = useState(false);
+  const [coord, setCoord] = useState<{x:number, y: number} | null>(null)
+  const [noteItem, setNoteItem] = useState<Note | null>(null)
 
   function onCreate(title: string, content: string) {
     const newNote: Note = {
@@ -52,8 +58,24 @@ export default function Note(){
     setText('');
     setTitle('');
   }
+
+  // Контекстне меню
+  function onContextMenu(e: React.MouseEvent<HTMLDivElement>, item: Note){
+    e.preventDefault();
+    setIsOpenMenu(true);
+    setCoord({x: e.clientX, y: e.clientY})
+    setNoteItem(item)
+    console.log(item)
+  }
+
+  // Закриття контекстного меню
+  function onCloseContextMenu(e: React.MouseEvent<HTMLDivElement>){
+    setIsOpenMenu(false);
+  }
+
+
   return (
-    <div className={container}>
+    <div className={container} onClick={onCloseContextMenu}>
       <div className={noteContainer}>
         {isOpen ?
           <div className={headerNote}>
@@ -77,12 +99,17 @@ export default function Note(){
       </div>
       <div className={arrContainer}>
         {note.length !== 0 ? note.map((item) => (
-          <div className={itemNote} key ={item.id}>
+          <div className={itemNote} key ={item.id} onContextMenu={(e) => onContextMenu(e, item)}>
+            
+            
             <h1 className={itemNoteTitle}>{item.title}</h1>
             <h2 className={itemNoteContent}>{item.content}</h2>
             <h3 className={itemNoteDate}>{item.createdAt.toLocaleString()}</h3>
           </div>
-        )) : <div className={arrEmpty} >
+        ))
+        
+
+        : <div className={arrEmpty} >
           <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
             <path
               d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
@@ -94,6 +121,7 @@ export default function Note(){
           <p>No notes yet</p>
           <small>Click "Create" to add your first note</small>
         </div> }
+        {isOpenMenu && coord ? <ContextMenu x={coord.x} y={coord.y}/> : null}
       </div>
     </div>
   );
