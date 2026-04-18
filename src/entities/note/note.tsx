@@ -1,7 +1,7 @@
 import  Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
 import { type Note } from './model/types';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const container = 'flex flex-col items-center w-full min-h-screen';
 const noteContainer = 'flex flex-col  pt-[10px] pb-[30px] gap-[15px] w-fit';
@@ -69,13 +69,29 @@ export default function Note(){
   }
 
   // Закриття контекстного меню
-  function onCloseContextMenu(e: React.MouseEvent<HTMLDivElement>){
-    setIsOpenMenu(false);
-  }
+  const menuRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!isOpenMenu) return;
+
+    function onCloseMenu (e: MouseEvent){
+      if(menuRef.current && !menuRef.current.contains(e.target as Node)){
+        setIsOpenMenu(false)
+      }
+    }
+
+    document.addEventListener('click', onCloseMenu)
+
+    return () => {
+      document.removeEventListener('click', onCloseMenu)
+    };
+
+  }, [isOpenMenu]
+  )
 
 
   return (
-    <div className={container} onClick={onCloseContextMenu}>
+    <div className={container}>
       <div className={noteContainer}>
         {isOpen ?
           <div className={headerNote}>
@@ -121,7 +137,7 @@ export default function Note(){
           <p>No notes yet</p>
           <small>Click "Create" to add your first note</small>
         </div> }
-        {isOpenMenu && coord ? <ContextMenu x={coord.x} y={coord.y}/> : null}
+        {isOpenMenu && coord ? <ContextMenu x={coord.x} y={coord.y} menuRef={menuRef}/> : null}
       </div>
     </div>
   );
