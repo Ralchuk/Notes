@@ -40,12 +40,31 @@ export default function Note(){
     setIsOpen(false);
   }
 
+  function onEdit(title: string, content: string) {
+    if (!noteItem)return;
+    setNote((prev) =>
+    prev.map((item) =>
+      item.id === noteItem.id
+        ? {
+            ...item,
+            title,
+            content,
+          }
+        : item
+    )
+  );
+  setIsOpen(false);
+  setNoteItem(null);
+  }
+
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>){
     e.preventDefault();
 
     if (!title.trim() || !text.trim()) return;
-
-    onCreate(title,text);
+    if (noteItem) {
+      onEdit(title, text)
+    } else {
+    onCreate(title,text);}
     setText('');
     setTitle('');
   }
@@ -68,14 +87,28 @@ export default function Note(){
     console.log(item)
   }
 
+  function onEditNote(item: Note){
+    setIsOpenMenu(false);
+    setIsOpen(true);
+    setNoteItem(item);
+    setTitle(item.title)
+    setText(item.content)
+  }
+
+  function onDeleteNote(item: Note){
+    setIsOpenMenu(false);
+    setNote(prev => prev.filter(n => n.id !== item.id))
+  }
+
   // Закриття контекстного меню
   const menuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (!isOpenMenu) return;
-
+    
     function onCloseMenu (e: MouseEvent){
       if(menuRef.current && !menuRef.current.contains(e.target as Node)){
+        console.log("Close menu")
         setIsOpenMenu(false)
       }
     }
@@ -137,7 +170,7 @@ export default function Note(){
           <p>No notes yet</p>
           <small>Click "Create" to add your first note</small>
         </div> }
-        {isOpenMenu && coord ? <ContextMenu x={coord.x} y={coord.y} menuRef={menuRef}/> : null}
+        {isOpenMenu && coord && noteItem ? <ContextMenu x={coord.x} y={coord.y} menuRef={menuRef} onDeleteNote={() => onDeleteNote(noteItem)} onEditNote={() => onEditNote(noteItem)}/> : null}
       </div>
     </div>
   );

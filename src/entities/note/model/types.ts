@@ -12,3 +12,11 @@ export type PropForm = {
     setText: (value: string) => void,
     onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void,
 };
+
+export type PropContextMenu = {
+    x: number;
+    y: number;
+    menuRef: React.RefObject<HTMLDivElement | null>;
+    onEditNote: () => void;
+    onDeleteNote: () => void;
+}
