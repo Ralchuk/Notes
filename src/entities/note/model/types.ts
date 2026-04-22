@@ -28,9 +28,12 @@ export type MenuAction =
       }
     }
   | {
+    type: 'HIDE_MENU';
+    }
+  | {
       type: 'CLOSE_MENU';
     };
-    
+
 export type PropContextMenu = {
     x: number;
     y: number;

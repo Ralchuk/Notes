@@ -19,6 +19,12 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
         coord: action.payload.coord,
         noteItem: action.payload.noteItem,
       };
+    case 'HIDE_MENU':
+      return {
+        ...state,
+        isOpenMenu: false,
+        coord: null,
+      };
     case 'CLOSE_MENU':
       return {
         ...state,
@@ -125,7 +131,7 @@ export default function Note(){
   }
 
   function onEditNote(item: Note){
-    dispatch({ type: 'CLOSE_MENU' });
+    dispatch({ type: 'HIDE_MENU' });
     setIsOpen(true);
     setTitle(item.title)
     setText(item.content)
