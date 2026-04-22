@@ -1,7 +1,32 @@
 import  Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
 import { type Note } from './model/types';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useReducer } from 'react';
+
+type MenuState = {
+  isOpenMenu: boolean;
+  coord: {x: number, y: number} | null;
+  noteItem: Note | null;
+}
+
+type MenuAction = 
+  | {
+      type: 'OPEN_MENU';
+      payload: {
+        coord: {x: number; y: number};
+        noteItem: Note;
+      }
+    }
+  | {
+      type: 'CLOSE_MENU';
+    };
+
+const initialState: MenuState = {
+    isOpenMenu: false,
+    coord:  null,
+    noteItem: null,
+}
+
 
 const container = 'flex flex-col items-center w-full min-h-screen';
 const noteContainer = 'flex flex-col  pt-[10px] pb-[30px] gap-[15px] w-fit';
@@ -28,6 +53,9 @@ export default function Note(){
   const [isOpenMenu, setIsOpenMenu] = useState(false);
   const [coord, setCoord] = useState<{x:number, y: number} | null>(null)
   const [noteItem, setNoteItem] = useState<Note | null>(null)
+
+ // useReducer 
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   function onCreate(title: string, content: string) {
     const newNote: Note = {

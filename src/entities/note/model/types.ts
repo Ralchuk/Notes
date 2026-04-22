@@ -12,3 +12,21 @@ export type PropForm = {
     setText: (value: string) => void,
     onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void,
 };
+
+export type MenuState = {
+  isOpenMenu: boolean;
+  coord: {x: number, y: number} | null;
+  noteItem: Note | null;
+}
+
+esport type MenuAction = 
+  | {
+      type: 'OPEN_MENU';
+      payload: {
+        coord: {x: number; y: number};
+        noteItem: Note;
+      }
+    }
+  | {
+      type: 'CLOSE_MENU';
+    };
