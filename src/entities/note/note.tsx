@@ -1,30 +1,35 @@
 import  Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
-import { type Note } from './model/types';
+import { type Note, type MenuAction, type MenuState  } from './model/types';
 import { useState, useEffect, useRef, useReducer } from 'react';
 
-type MenuState = {
-  isOpenMenu: boolean;
-  coord: {x: number, y: number} | null;
-  noteItem: Note | null;
-}
-
-type MenuAction = 
-  | {
-      type: 'OPEN_MENU';
-      payload: {
-        coord: {x: number; y: number};
-        noteItem: Note;
-      }
-    }
-  | {
-      type: 'CLOSE_MENU';
-    };
 
 const initialState: MenuState = {
     isOpenMenu: false,
     coord:  null,
     noteItem: null,
+}
+
+function reducer(state: MenuState, action: MenuAction): MenuState {
+  switch (action.type) {
+    case 'OPEN_MENU':
+      return {
+        ...state,
+        isOpenMenu: true,
+        coord: action.payload.coord,
+        noteItem: action.payload.noteItem,
+      };
+    case 'CLOSE_MENU':
+      return {
+        ...state,
+        isOpenMenu: false,
+        coord: null,
+        noteItem: null,
+      };
+
+    default:
+      return state;
+  }
 }
 
 
@@ -50,11 +55,11 @@ export default function Note(){
   const [text, setText] = useState('');
 
   // states for contextMenu
-  const [isOpenMenu, setIsOpenMenu] = useState(false);
-  const [coord, setCoord] = useState<{x:number, y: number} | null>(null)
-  const [noteItem, setNoteItem] = useState<Note | null>(null)
+  // const [isOpenMenu, setIsOpenMenu] = useState(false);
+  // const [coord, setCoord] = useState<{x:number, y: number} | null>(null)
+  // const [noteItem, setNoteItem] = useState<Note | null>(null)
 
- // useReducer 
+//  // useReducer 
   const [state, dispatch] = useReducer(reducer, initialState)
 
   function onCreate(title: string, content: string) {
@@ -68,12 +73,32 @@ export default function Note(){
     setIsOpen(false);
   }
 
+  function onEdit(title: string, content: string) {
+    const currentNote = state.noteItem;
+    if (!currentNote)return;
+    setNote((prev) =>
+    prev.map((item) =>
+      item.id === currentNote.id
+        ? {
+            ...item,
+            title,
+            content,
+          }
+        : item
+    )
+  );
+  setIsOpen(false);
+  dispatch({type: 'CLOSE_MENU'});
+  }
+
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>){
     e.preventDefault();
 
     if (!title.trim() || !text.trim()) return;
-
-    onCreate(title,text);
+    if (state.noteItem) {
+      onEdit(title, text)
+    } else {
+    onCreate(title,text);}
     setText('');
     setTitle('');
   }
@@ -90,21 +115,37 @@ export default function Note(){
   // Контекстне меню
   function onContextMenu(e: React.MouseEvent<HTMLDivElement>, item: Note){
     e.preventDefault();
-    setIsOpenMenu(true);
-    setCoord({x: e.clientX, y: e.clientY})
-    setNoteItem(item)
-    console.log(item)
+    dispatch({
+      type: 'OPEN_MENU',
+      payload: {
+        coord: { x: e.clientX, y: e.clientY },
+        noteItem: item,
+      },
+    });
+  }
+
+  function onEditNote(item: Note){
+    dispatch({ type: 'CLOSE_MENU' });
+    setIsOpen(true);
+    setTitle(item.title)
+    setText(item.content)
+  }
+
+  function onDeleteNote(item: Note){
+    dispatch({ type: 'CLOSE_MENU' });
+    setNote(prev => prev.filter(n => n.id !== item.id))
   }
 
   // Закриття контекстного меню
   const menuRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (!isOpenMenu) return;
-
+    if (!state.isOpenMenu) return;
+    
     function onCloseMenu (e: MouseEvent){
       if(menuRef.current && !menuRef.current.contains(e.target as Node)){
-        setIsOpenMenu(false)
+        console.log("Close menu")
+        dispatch({ type: 'CLOSE_MENU' });
       }
     }
 
@@ -114,7 +155,7 @@ export default function Note(){
       document.removeEventListener('click', onCloseMenu)
     };
 
-  }, [isOpenMenu]
+  }, [state.isOpenMenu]
   )
 
 
@@ -165,7 +206,7 @@ export default function Note(){
           <p>No notes yet</p>
           <small>Click "Create" to add your first note</small>
         </div> }
-        {isOpenMenu && coord ? <ContextMenu x={coord.x} y={coord.y} menuRef={menuRef}/> : null}
+        {state.isOpenMenu && state.coord && state.noteItem ? <ContextMenu x={state.coord.x} y={state.coord.y} menuRef={menuRef} onDeleteNote={() => onDeleteNote(state.noteItem!)} onEditNote={() => onEditNote(state.noteItem!)}/> : null}
       </div>
     </div>
   );

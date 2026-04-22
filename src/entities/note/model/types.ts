@@ -19,7 +19,7 @@ export type MenuState = {
   noteItem: Note | null;
 }
 
-esport type MenuAction = 
+export type MenuAction = 
   | {
       type: 'OPEN_MENU';
       payload: {
@@ -30,3 +30,11 @@ esport type MenuAction =
   | {
       type: 'CLOSE_MENU';
     };
+    
+export type PropContextMenu = {
+    x: number;
+    y: number;
+    menuRef: React.RefObject<HTMLDivElement | null>;
+    onEditNote: () => void;
+    onDeleteNote: () => void;
+}
