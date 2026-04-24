@@ -1,10 +1,34 @@
 import  Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
+import useStickyState from '../hooks/useStickyState';
 import { type Note, type MenuAction, type MenuState  } from './model/types';
 import { useState, useEffect, useRef, useReducer } from 'react';
 
 
-const initialState: MenuState = {
+const container = 'flex flex-col items-center w-full min-h-screen';
+const noteContainer = 'flex flex-col  pt-[10px] pb-[30px] gap-[15px] w-fit';
+const headerNote = 'flex flex-col items-center gap-[15px] w-[350px]';
+const headerNoteBtn = 'flex flex-row gap-[10px]';
+const btnCreate = 'flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
+const btnClear = 'flex uppercase px-6 py-2 text-[#1976d3] bg-white border-[1px] border-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:border-[#1976d3]/50 hover:text-[#1976d3]/50 cursor-pointer';
+const formContainer = 'flex flex-col gap-[10px] w-full';
+const btnClose = 'flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
+const arrContainer = 'flex flex-col gap-[20px] px-[20px] w-full';
+const itemNote = 'border-y-[1px] border-[#1976d3]/50';
+const itemNoteTitle = 'text-[#1976d3] text-[32px] font-[Roboto, sans-serif]';
+const itemNoteContent = 'text-black/50 text-[16px] font-[Roboto, sans-serif]';
+const itemNoteDate = 'text-black/25 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
+const arrEmpty = 'flex flex-col items-center opacity-50';
+
+export default function Note(){
+  const [isOpen, setIsOpen] = useState(false);
+  const [note, setNote] = useStickyState<Note[]>('notes', []);
+  const [title,setTitle] = useState('');
+  const [text, setText] = useState('');
+
+   // useReducer 
+
+  const initialState: MenuState = {
     isOpenMenu: false,
     coord:  null,
     noteItem: null,
@@ -39,33 +63,6 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
 }
 
 
-const container = 'flex flex-col items-center w-full min-h-screen';
-const noteContainer = 'flex flex-col  pt-[10px] pb-[30px] gap-[15px] w-fit';
-const headerNote = 'flex flex-col items-center gap-[15px] w-[350px]';
-const headerNoteBtn = 'flex flex-row gap-[10px]';
-const btnCreate = 'flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
-const btnClear = 'flex uppercase px-6 py-2 text-[#1976d3] bg-white border-[1px] border-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:border-[#1976d3]/50 hover:text-[#1976d3]/50 cursor-pointer';
-const formContainer = 'flex flex-col gap-[10px] w-full';
-const btnClose = 'flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
-const arrContainer = 'flex flex-col gap-[20px] px-[20px] w-full';
-const itemNote = 'border-y-[1px] border-[#1976d3]/50';
-const itemNoteTitle = 'text-[#1976d3] text-[32px] font-[Roboto, sans-serif]';
-const itemNoteContent = 'text-black/50 text-[16px] font-[Roboto, sans-serif]';
-const itemNoteDate = 'text-black/25 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
-const arrEmpty = 'flex flex-col items-center opacity-50';
-
-export default function Note(){
-  const [isOpen, setIsOpen] = useState(false);
-  const [note, setNote] = useState<Note[]>([]);
-  const [title,setTitle] = useState('');
-  const [text, setText] = useState('');
-
-  // states for contextMenu
-  // const [isOpenMenu, setIsOpenMenu] = useState(false);
-  // const [coord, setCoord] = useState<{x:number, y: number} | null>(null)
-  // const [noteItem, setNoteItem] = useState<Note | null>(null)
-
-//  // useReducer 
   const [state, dispatch] = useReducer(reducer, initialState)
 
   function onCreate(title: string, content: string) {

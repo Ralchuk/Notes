@@ -13,12 +13,14 @@ export default function Form({title, text, setTitle, setText, onSubmit}: PropFor
         onSubmit={onSubmit}>
         <input 
           className={formTitle}
+          placeholder='Enter note title...'
           value={title}
           onChange={(e) => setTitle(e.target.value)}>
         </input>
         <textarea
           rows={4}
           className={formText}
+          placeholder='Write your note here...'
           value={text}
           onChange={(e) => setText(e.target.value)}>
         </textarea>
