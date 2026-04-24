@@ -1,12 +1,12 @@
 import Note from '@/entities/note/note';
-import Videopleyer from '@/lab/Videopleyer';
+import Videoplayer from '@/lab/Videoplayer';
 
 
 function App() {
   
   return (
     <>
-      <Videopleyer/>
+      <Videoplayer/>
     </>
   );
 }
