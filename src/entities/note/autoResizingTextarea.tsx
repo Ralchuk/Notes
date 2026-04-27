@@ -29,7 +29,7 @@ const AutoResizingTextArea = forwardRef<AutoResizeTextareaHandle, PropResizingTe
         <div>
             <textarea 
                 ref ={refTextarea}
-                rows={1}
+                rows={4}
                 className={formText}
                 placeholder='Write your note here...'
                 value={text}
