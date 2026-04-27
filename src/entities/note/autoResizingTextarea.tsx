@@ -27,18 +27,18 @@ const AutoResizingTextArea = forwardRef<AutoResizeTextareaHandle, PropResizingTe
     }
     return (
         <div>
-                <textarea 
-                    ref ={refTextarea}
-                    rows={1}
-                    className={formText}
-                    placeholder='Write your note here...'
-                    value={text}
-                    onChange={(e) => {
-                        setText(e.target.value);
-                        handleResize()
-                    }}
-                >
-                </textarea>
+            <textarea 
+                ref ={refTextarea}
+                rows={1}
+                className={formText}
+                placeholder='Write your note here...'
+                value={text}
+                onChange={(e) => {
+                    setText(e.target.value);
+                    handleResize()
+                }}
+            >
+            </textarea>
         </div>
     )
 })
