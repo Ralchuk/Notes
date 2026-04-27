@@ -1,13 +1,10 @@
-import { type PropForm, type AutoResizeTextareaHandle} from './model/types';
+import { type PropForm} from './model/types';
 import AutoResizingTextArea from './autoResizingTextarea';
-import { useRef } from 'react';
 
 const formWrapper = 'flex flex-col gap-[10px] w-[fit]';
 const formTitle = 'px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:italic focus:placeholder-transparent';
-const formText = 'px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none resize-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:italic focus:placeholder-transparent';
 
-export default function Form({title, text, setTitle, setText, onSubmit}: PropForm ) {
-  const auto = useRef<AutoResizeTextareaHandle | null> (null);
+export default function Form({title, text, setTitle, setText, onSubmit, auto}: PropForm ) {
   return (
     <div >
       <form 

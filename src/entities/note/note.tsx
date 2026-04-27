@@ -1,7 +1,7 @@
 import  Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
 import useStickyState from '../hooks/useStickyState';
-import { type Note, type MenuAction, type MenuState  } from './model/types';
+import { type Note, type MenuAction, type MenuState, type AutoResizeTextareaHandle  } from './model/types';
 import { useState, useEffect, useRef, useReducer } from 'react';
 
 
@@ -61,7 +61,7 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
       return state;
   }
 }
-
+ const auto = useRef<AutoResizeTextareaHandle | null>(null);
 
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -111,8 +111,8 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
   }
 
   function handleClearForm(){
-    setText('');
     setTitle('');
+    auto.current?.resetAndFocus();
   }
 
   // Контекстне меню
@@ -172,7 +172,7 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
               <button className={btnClear} onClick={handleClearForm}>Clear</button>
             </div>
             <div className={formContainer}>
-              <Form title={title} text={text} setTitle={setTitle} setText={setText} onSubmit={handleSubmit} /> 
+              <Form title={title} text={text} setTitle={setTitle} setText={setText} onSubmit={handleSubmit} auto={auto}/> 
               <button className={btnClose} onClick={() => setIsOpen(false)}>Close</button>
             </div>
           </div>

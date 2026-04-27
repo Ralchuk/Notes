@@ -11,6 +11,7 @@ export type PropForm = {
     setTitle: (value: string) => void,
     setText: (value: string) => void,
     onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void,
+    auto: React.RefObject<AutoResizeTextareaHandle | null>,
 };
 
 export type PropResizingTextarea = {
