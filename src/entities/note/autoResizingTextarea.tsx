@@ -1,21 +1,22 @@
 import { forwardRef, useRef, useImperativeHandle } from "react";
-import { type PropForm } from './model/types';
+import { type PropResizingTextarea } from './model/types';
+import { type AutoResizeTextareaHandle } from './model/types';
 
-type AutoResizeTextareaHandle = {
-  resetAndFocus: () => void;
-};
 
-const formText = 'px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none resize-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:italic focus:placeholder-transparent';
 
-const AutoResizingTextArea = forwardRef<AutoResizeTextareaHandle, PropForm>({text, setText}, ref) => {
+const formText = 'w-full px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none resize-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:italic focus:placeholder-transparent';
+
+const AutoResizingTextArea = forwardRef<AutoResizeTextareaHandle, PropResizingTextarea>(({text, setText}, ref) => {
     const refTextarea= useRef<HTMLTextAreaElement | null>(null)
 
-    useImperativeHandle(ref, () => {
-      return function resetAndFocus(){
-        setText('');
-
-      }
-    })
+    useImperativeHandle(ref, () => ({
+       resetAndFocus:
+       () => {
+            setText('');
+            refTextarea.current?.focus()
+       }
+    }))
+    
 
     function handleResize(){
         const el = refTextarea.current;
@@ -24,28 +25,22 @@ const AutoResizingTextArea = forwardRef<AutoResizeTextareaHandle, PropForm>({tex
         el.style.height = 'auto';
         el.style.height = el.scrollHeight + 'px';
     }
-
-    
     return (
         <div>
-            <form>
                 <textarea 
-                ref ={refTextarea}
-                rows={4}
-                className={formText}
-                placeholder='Write your note here...'
-                value={text}
-                onChange={(e) => {
-                    setText(e.target.value);
-                    handleResize()
-                }}
-                
+                    ref ={refTextarea}
+                    rows={4}
+                    className={formText}
+                    placeholder='Write your note here...'
+                    value={text}
+                    onChange={(e) => {
+                        setText(e.target.value);
+                        handleResize()
+                    }}
                 >
-                    
                 </textarea>
-            </form>
         </div>
     )
-}
+})
 
-export default;
+export default AutoResizingTextArea; 

@@ -13,6 +13,11 @@ export type PropForm = {
     onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void,
 };
 
+export type PropResizingTextarea = {
+    text: string,
+    setText: (value: string) => void,
+};
+
 export type MenuState = {
   isOpenMenu: boolean;
   coord: {x: number, y: number} | null;
@@ -41,3 +46,7 @@ export type PropContextMenu = {
     onEditNote: () => void;
     onDeleteNote: () => void;
 }
+
+export type AutoResizeTextareaHandle = {
+  resetAndFocus: () => void;
+};

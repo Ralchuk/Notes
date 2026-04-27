@@ -7,7 +7,7 @@ function App() {
   
   return (
     <>
-      <AutoResizingTextArea/>
+      <Note/>
     </>
   );
 }
