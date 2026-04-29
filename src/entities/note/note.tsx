@@ -20,15 +20,32 @@ const itemNoteContent = 'text-black/50 text-[16px] font-[Roboto, sans-serif]';
 const itemNoteDate = 'text-black/25 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
 const arrEmpty = 'flex flex-col items-center opacity-50';
 
-export default function Note(){
-  const [isOpen, setIsOpen] = useState(false);
-  const [note, setNote] = useStickyState<Note[]>('notes', []);
-  const [title,setTitle] = useState('');
-  const [text, setText] = useState('');
+// reducer для заметок
 
-   // useReducer 
+type NoteState = {
+  isOpen: boolean,
+  note: Note[],
+  title: string,
+  text: string,
+};
 
-  const initialState: MenuState = {
+type NoteAction = 
+| {
+  type: 'OPEN_FORM',
+}
+| {
+  type: 'SET_NOTE',
+}
+| {
+  type: 'SET_TITLE',
+}
+| {
+  type: 'SET_TEXT',
+};
+
+// reducer для контекстного меню
+
+ const initialState: MenuState = {
     isOpenMenu: false,
     coord:  null,
     noteItem: null,
@@ -61,7 +78,16 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
       return state;
   }
 }
- const auto = useRef<AutoResizeTextareaHandle | null>(null);
+
+export default function Note(){
+  const [isOpen, setIsOpen] = useState(false);
+  const [note, setNote] = useStickyState<Note[]>('notes', []);
+  const [title,setTitle] = useState('');
+  const [text, setText] = useState('');
+
+   // useReducer ContexMenu
+ 
+  const auto = useRef<AutoResizeTextareaHandle | null>(null);
 
   const [state, dispatch] = useReducer(reducer, initialState)
 

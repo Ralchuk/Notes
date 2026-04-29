@@ -1,11 +1,11 @@
-// import Note from '@/entities/note/note';
-import TimerLab from "@/lab/TimerLab";
+import Note from '@/entities/note/note';
+
 
 function App() {
   
   return (
     <>
-      <TimerLab/>
+      <Note/>
     </>
   );
 }
