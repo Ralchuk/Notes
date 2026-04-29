@@ -71,31 +71,23 @@ const TimerLab = () => {
 
     const[state, dispatch] = useReducer(reducer, initialState);
 
-    // const [time, setTime] = useState<number>(0);
-    // const [isRunning, setIsRunning] = useState(false);
-    // const [lap, setLap] = useState<number[]>([]);
 
     function handleClick(){
         dispatch({type: 'START'})
-        // setIsRunning(true);
-    }
+    };
 
     function handlePause(){
         dispatch({type: 'PAUSE'})
-        // setIsRunning(false);
-    }
+    };
 
     function handlLap(){
         dispatch({type: 'LAP',
             payload: {time: state.time},
         });
-        // setLap([...lap, time]);
     }
     function handleReset(){
         dispatch({type: 'RESET'})
-        // setIsRunning(false);
-        // setTime(0);
-    }
+    };
 
 
     useEffect(() => {
@@ -128,4 +120,4 @@ const TimerLab = () => {
     )
 }
 
-export default TimerLab
+export default TimerLab;
