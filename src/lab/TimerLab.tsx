@@ -16,8 +16,17 @@ const TimerLab = () => {
     function handleClick(){
         setIsRunning(true);
     }
+
+    function handlePause(){
+        setIsRunning(false)
+    }
+
     function handlLap(){
         setLap([...lap, time])
+    }
+    function handleReset(){
+        setIsRunning(false)
+        setTime(0)
     }
 
 
@@ -40,6 +49,8 @@ const TimerLab = () => {
             <div>
             <button className="py-1 px-4 rounded-[5px] border-[1px]" onClick={handleClick}>GO</button>
             <button className="py-1 px-4 rounded-[5px] border-[1px]" onClick={handlLap}>Set Lap</button>
+            <button className="py-1 px-4 rounded-[5px] border-[1px]" onClick={handlePause}>Pause</button>
+            <button className="py-1 px-4 rounded-[5px] border-[1px]" onClick={handleReset}>Reset</button>
             </div>
             
         </div>
