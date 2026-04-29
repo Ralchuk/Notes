@@ -1,5 +1,7 @@
 import {useReducer, useEffect} from "react";
 
+const btn = 'py-1 px-4 rounded-[10px] border-[1px] border-red-500 font-[Roboto, sans-serif] font-medium text-red-500 cursor-pointer transition-all duration-200 hover:border-red-200 hover:text-red-200 ';
+
 interface TimerState {
     time: number,
     isRunning: boolean,
@@ -98,7 +100,7 @@ const TimerLab = () => {
     },[state.isRunning]);
 
     return (
-        <div className="flex flex-col  items-center">
+        <div className="flex flex-col gap-[10px] items-center font-[Roboto, sans-serif] font-normal ">
             <p>{state.time}</p>
             <div>
                 {state.lap.map((item, index) => (
@@ -109,11 +111,11 @@ const TimerLab = () => {
                 )}
             </div>
             
-            <div>
-            <button className="py-1 px-4 rounded-[5px] border-[1px]" onClick={handleClick}>GO</button>
-            <button className="py-1 px-4 rounded-[5px] border-[1px]" onClick={handlLap}>Set Lap</button>
-            <button className="py-1 px-4 rounded-[5px] border-[1px]" onClick={handlePause}>Pause</button>
-            <button className="py-1 px-4 rounded-[5px] border-[1px]" onClick={handleReset}>Reset</button>
+            <div className="flex gap-[10px]">
+            <button className={btn} onClick={handleClick}>GO</button>
+            <button className={btn} onClick={handlLap}>LAP</button>
+            <button className={btn} onClick={handlePause}>PAUSE</button>
+            <button className={btn} onClick={handleReset}>RESET</button>
             </div>
             
         </div>
