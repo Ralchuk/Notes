@@ -100,7 +100,7 @@ const TimerLab = () => {
     },[state.isRunning]);
 
     return (
-        <div className="flex flex-col gap-[10px] items-center font-[Roboto, sans-serif] font-normal ">
+        <div className="flex flex-col gap-[10px] pt-[10px] items-center font-[Roboto, sans-serif] font-normal ">
             <p>{state.time}</p>
             <div>
                 {state.lap.map((item, index) => (
