@@ -116,7 +116,7 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState{
     case 'DELETE_NOTE':
       return {
         ...state,
-        note: [...state.note.filter((n) => {n.id !== action.payload.id})]
+        note: [...state.note.filter((n) => n.id !== action.payload.id)]
       };
     case 'EDIT_NOTE':
       return {
@@ -199,30 +199,16 @@ export default function Note(){
     })
   };
 
-  function onEdit(item: Note) {
-    const currentNote = stateNote.note;
-    if (!currentNote)return;
-    dispatchNote({
-      type: 'EDIT_NOTE',
-      payload: {
-        id: item.id, 
-        title: item.title, 
-        content: item.content, 
-        createdAt: item.createdAt
-      }});
-    dispatchNote({type: 'CLOSE_FORM'})
-    dispatch({type: 'CLOSE_MENU'});
-  };
-
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>){
     e.preventDefault();
 
     if (!stateNote.title.trim() || !stateNote.text.trim()) return;
     if (state.noteItem ) {
-      onEdit(state.noteItem)
+      onEditNote()
     } else {
       onCreate()
-    } dispatchNote({type: 'CLEAR_FORM'});
+    } 
+    dispatchNote({type: 'CLOSE_FORM'});
   };
 
   function handleCleanNotes(){
@@ -251,10 +237,17 @@ export default function Note(){
   function onEditNote(){
     dispatch({ type: 'HIDE_MENU' });
     dispatchNote({type:'OPEN_FORM'})
-    // setIsOpen(true);
-    // setTitle(item.title)
-    // setText(item.content)
-  }
+    if(state.noteItem) {
+      dispatchNote({
+        type: 'SET_TITLE',
+        payload: state.noteItem?.title
+      });
+      dispatchNote({
+        type: 'SET_TEXT',
+        payload: state.noteItem?.content,
+      });
+    };
+  };
 
   function onDeleteNote(item: Note){
     dispatch({ type: 'CLOSE_MENU' });
