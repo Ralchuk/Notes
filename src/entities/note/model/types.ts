@@ -38,7 +38,49 @@ export type MenuAction =
     }
   | {
       type: 'CLOSE_MENU';
-    };
+};
+
+export type NoteState = {
+  isOpen: boolean,
+  note: Note[],
+  title: string,
+  text: string,
+};
+
+export type NoteAction = 
+| {
+  type: 'OPEN_FORM',
+}
+| {
+  type: 'SET_TITLE',
+  payload: string,
+}
+| {
+  type: 'SET_TEXT',
+  payload: string,
+}
+| {
+  type: 'SAVE_NOTE',
+  payload: {title: string, text: string}
+}
+| {
+  type: 'CLEAR_FORM',
+}
+| {
+  type: 'CLOSE_FORM',
+}
+| {
+  type: 'CLEAR_NOTES'
+}
+|{
+  type: 'DELETE_NOTE',
+  payload: {id: string}
+}
+|{
+  type: 'EDIT_NOTE',
+  payload: {id: string, title: string, content: string, createdAt: Date},
+};
+
 
 export type PropContextMenu = {
     x: number;

@@ -1,8 +1,7 @@
 import  Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
-import useStickyState from '../hooks/useStickyState';
-import { type Note, type MenuAction, type MenuState, type AutoResizeTextareaHandle  } from './model/types';
-import { useState, useEffect, useRef, useReducer } from 'react';
+import { type Note, type MenuAction, type MenuState, type AutoResizeTextareaHandle, type NoteState, type NoteAction  } from './model/types';
+import { useEffect, useRef, useReducer } from 'react';
 
 
 const container = 'flex flex-col items-center w-full min-h-screen';
@@ -21,47 +20,6 @@ const itemNoteDate = 'text-black/25 text-[12px] font-[Roboto, sans-serif] font-b
 const arrEmpty = 'flex flex-col items-center opacity-50';
 
 // reducer для заметок
-
-type NoteState = {
-  isOpen: boolean,
-  note: Note[],
-  title: string,
-  text: string,
-};
-
-type NoteAction = 
-| {
-  type: 'OPEN_FORM',
-}
-| {
-  type: 'SET_TITLE',
-  payload: string,
-}
-| {
-  type: 'SET_TEXT',
-  payload: string,
-}
-| {
-  type: 'SAVE_NOTE',
-  payload: {title: string, text: string}
-}
-| {
-  type: 'CLEAR_FORM',
-}
-| {
-  type: 'CLOSE_FORM',
-}
-| {
-  type: 'CLEAR_NOTES'
-}
-|{
-  type: 'DELETE_NOTE',
-  payload: {id: string}
-}
-|{
-  type: 'EDIT_NOTE',
-  payload: {id: string, title: string, content: string, createdAt: Date},
-};
 
 const initialStateNote: NoteState = {
   isOpen: false,
