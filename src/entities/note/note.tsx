@@ -34,13 +34,96 @@ type NoteAction =
   type: 'OPEN_FORM',
 }
 | {
-  type: 'SET_NOTE',
-}
-| {
   type: 'SET_TITLE',
+  payload: string,
 }
 | {
   type: 'SET_TEXT',
+  payload: string,
+}
+| {
+  type: 'SAVE_NOTE',
+  payload: {title: string, text: string}
+}
+| {
+  type: 'CLEAR_FORM',
+}
+| {
+  type: 'CLOSE_FORM',
+}
+| {
+  type: 'CLEAR_NOTES'
+}
+|{
+  type: 'DELETE_NOTE',
+  payload: {id: string}
+}
+|{
+  type: 'EDIT_NOTE',
+  payload: {id: string, title: string, content: string, createdAt: Date},
+};
+
+const initialStateNote: NoteState = {
+  isOpen: false,
+  note: [],
+  title: '',
+  text: '',
+};
+
+function reducerNote(state: NoteState, action: NoteAction): NoteState{
+  switch(action.type){
+    case 'OPEN_FORM':
+      return {
+        ...state,
+        isOpen: true,
+      };
+    case 'SET_TITLE':
+      return {
+        ...state,
+        title: action.payload,
+      };
+    case 'SET_TEXT':
+      return {
+        ...state,
+        text: action.payload,
+      };
+    case 'SAVE_NOTE':
+      return {
+        ...state,
+        note: [...state.note, {id: Date.now().toString(), createdAt: new Date(),  content: action.payload.text, title: action.payload.title}],
+        title: '',
+        text: '',
+        isOpen: false,
+      };
+    case 'CLEAR_FORM':
+      return {
+        ...state,
+        title: '',
+        text: '',
+      };
+    case 'CLOSE_FORM':
+      return {
+        ...state,
+        title: '',
+        text: '',
+        isOpen: false,
+      };
+    case 'CLEAR_NOTES':
+      return {
+        ...state,
+        note: [],
+      };
+    case 'DELETE_NOTE':
+      return {
+        ...state,
+        note: [...state.note.filter((n) => {n.id !== action.payload.id})]
+      };
+    case 'EDIT_NOTE':
+      return {
+        ...state,
+        note: [...state.note.map((n) => (n.id === action.payload.id ? {...n, title: action.payload.title, content: action.payload.content, createdAt: action.payload.createdAt} : n))]
+      }
+  };
 };
 
 // reducer для контекстного меню
@@ -49,7 +132,7 @@ type NoteAction =
     isOpenMenu: false,
     coord:  null,
     noteItem: null,
-}
+};
 
 function reducer(state: MenuState, action: MenuAction): MenuState {
   switch (action.type) {
@@ -77,67 +160,79 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
     default:
       return state;
   }
-}
+};
+
 
 export default function Note(){
-  const [isOpen, setIsOpen] = useState(false);
-  const [note, setNote] = useStickyState<Note[]>('notes', []);
-  const [title,setTitle] = useState('');
-  const [text, setText] = useState('');
+  // const [isOpen, setIsOpen] = useState(false);
+  // const [note, setNote] = useStickyState<Note[]>('notes', []);
+  // const [title,setTitle] = useState('');
+  // const [text, setText] = useState('');
+
+  // useReducer Note
+  const [stateNote, dispatchNote] = useReducer(reducerNote, initialStateNote);
 
    // useReducer ContexMenu
  
   const auto = useRef<AutoResizeTextareaHandle | null>(null);
 
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, initialState);
 
-  function onCreate(title: string, content: string) {
-    const newNote: Note = {
-      id: Date.now().toString(),
-      title,
-      content,
-      createdAt: new Date(),
-    };
-    setNote((prev) => [newNote, ...prev]);
-    setIsOpen(false);
-  }
+  function onCreate() {
+    dispatchNote({
+      type: 'SAVE_NOTE',
+      payload: {title: stateNote.title, text: stateNote.text}
+    })
+  };
 
-  function onEdit(title: string, content: string) {
-    const currentNote = state.noteItem;
+  function setTiTle(value: string){
+    dispatchNote({
+      type: 'SET_TITLE',
+      payload: value,
+    })
+  };
+
+  function setText(value: string){
+    dispatchNote({
+      type: 'SET_TEXT',
+      payload: value,
+    })
+  };
+
+  function onEdit(item: Note) {
+    const currentNote = stateNote.note;
     if (!currentNote)return;
-    setNote((prev) =>
-    prev.map((item) =>
-      item.id === currentNote.id
-        ? {
-            ...item,
-            title,
-            content,
-          }
-        : item
-    )
-  );
-  setIsOpen(false);
-  dispatch({type: 'CLOSE_MENU'});
-  }
+    dispatchNote({
+      type: 'EDIT_NOTE',
+      payload: {
+        id: item.id, 
+        title: item.title, 
+        content: item.content, 
+        createdAt: item.createdAt
+      }});
+    dispatchNote({type: 'CLOSE_FORM'})
+    dispatch({type: 'CLOSE_MENU'});
+  };
 
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>){
     e.preventDefault();
 
-    if (!title.trim() || !text.trim()) return;
-    if (state.noteItem) {
-      onEdit(title, text)
+    if (!stateNote.title.trim() || !stateNote.text.trim()) return;
+    if (state.noteItem ) {
+      onEdit(state.noteItem)
     } else {
-    onCreate(title,text);}
-    setText('');
-    setTitle('');
-  }
+      onCreate()
+    } dispatchNote({type: 'CLEAR_FORM'});
+  };
 
   function handleCleanNotes(){
-    setNote([]);
+    dispatchNote({type:'CLEAR_NOTES'});
+    // setNote([]);
   }
 
   function handleClearForm(){
-    setTitle('');
+    dispatchNote({type:'CLEAR_FORM'});
+    // setTitle('');
     auto.current?.resetAndFocus();
   }
 
@@ -153,17 +248,20 @@ export default function Note(){
     });
   }
 
-  function onEditNote(item: Note){
+  function onEditNote(){
     dispatch({ type: 'HIDE_MENU' });
-    setIsOpen(true);
-    setTitle(item.title)
-    setText(item.content)
+    dispatchNote({type:'OPEN_FORM'})
+    // setIsOpen(true);
+    // setTitle(item.title)
+    // setText(item.content)
   }
 
   function onDeleteNote(item: Note){
     dispatch({ type: 'CLOSE_MENU' });
-    setNote(prev => prev.filter(n => n.id !== item.id))
-  }
+    dispatchNote({
+      type: 'DELETE_NOTE', 
+      payload: {id: item.id}});
+  };
 
   // Закриття контекстного меню
   const menuRef = useRef<HTMLDivElement | null>(null)
@@ -191,28 +289,28 @@ export default function Note(){
   return (
     <div className={container}>
       <div className={noteContainer}>
-        {isOpen ?
+        {stateNote.isOpen ?
           <div className={headerNote}>
             <div className={headerNoteBtn}>
               <button className={btnCreate} type='submit' form="note-form">Save</button>
               <button className={btnClear} onClick={handleClearForm}>Clear</button>
             </div>
             <div className={formContainer}>
-              <Form title={title} text={text} setTitle={setTitle} setText={setText} onSubmit={handleSubmit} auto={auto}/> 
-              <button className={btnClose} onClick={() => setIsOpen(false)}>Close</button>
+              <Form title={stateNote.title} text={stateNote.text} setTitle={setTiTle} setText={setText} onSubmit={handleSubmit} auto={auto}/> 
+              <button className={btnClose} onClick={() => dispatchNote({type: 'CLOSE_FORM'})}>Close</button>
             </div>
           </div>
           : 
           <div className={headerNote}>
             <div className={headerNoteBtn}>
-              <button className={btnCreate} onClick={() => setIsOpen(true)}>Create</button>
+              <button className={btnCreate} onClick={() =>  dispatchNote({type: 'OPEN_FORM'})}>Create</button>
               <button className={btnClear} onClick={handleCleanNotes}>Clear</button>
             </div>
           </div>
         }
       </div>
       <div className={arrContainer}>
-        {note.length !== 0 ? note.map((item) => (
+        {stateNote.note.length !== 0 ? stateNote.note.map((item) => (
           <div className={itemNote} key ={item.id} onContextMenu={(e) => onContextMenu(e, item)}>
             
             
@@ -235,7 +333,7 @@ export default function Note(){
           <p>No notes yet</p>
           <small>Click "Create" to add your first note</small>
         </div> }
-        {state.isOpenMenu && state.coord && state.noteItem ? <ContextMenu x={state.coord.x} y={state.coord.y} menuRef={menuRef} onDeleteNote={() => onDeleteNote(state.noteItem!)} onEditNote={() => onEditNote(state.noteItem!)}/> : null}
+        {state.isOpenMenu && state.coord && state.noteItem ? <ContextMenu x={state.coord.x} y={state.coord.y} menuRef={menuRef} onDeleteNote={() => onDeleteNote(state.noteItem!)} onEditNote={() => onEditNote()}/> : null}
       </div>
     </div>
   );
