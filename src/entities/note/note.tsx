@@ -234,7 +234,16 @@ export default function Note() {
 
     if (!stateNote.title.trim() || !stateNote.text.trim()) return;
     if (state.noteItem) {
-      onEditNote();
+      dispatch({ type: "CLOSE_MENU" });
+       dispatchNote({
+        type: "EDIT_NOTE",
+        payload: {
+          id: state.noteItem.id,
+          title: stateNote.title,
+          content: stateNote.text,
+          createdAt: new Date(),
+        },
+      });
     } else {
       onCreate();
     }
