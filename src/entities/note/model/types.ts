@@ -3,6 +3,7 @@ export interface Note {
   title: string;
   content: string;
   createdAt: Date;
+  status: 'inprogress' | 'completed';
 }
 
 export type PropForm = {
@@ -38,13 +39,14 @@ export type MenuAction =
     }
   | {
       type: 'CLOSE_MENU';
-};
+    };
 
 export type NoteState = {
   isOpen: boolean,
   note: Note[],
   title: string,
   text: string,
+  status: boolean,
 };
 
 export type NoteAction = 
@@ -79,6 +81,14 @@ export type NoteAction =
 |{
   type: 'EDIT_NOTE',
   payload: {id: string, title: string, content: string, createdAt: Date},
+}
+|{
+  type: 'SET_STATUS_INPROGRESS',
+  payload: {id: string},
+}
+|{
+   type: 'SET_STATUS_COMPLETED',
+  payload: {id: string},
 };
 
 
@@ -88,6 +98,9 @@ export type PropContextMenu = {
     menuRef: React.RefObject<HTMLDivElement | null>;
     onEditNote: () => void;
     onDeleteNote: () => void;
+    onSetStatusCompleted: () => void;
+    onSetStatusInprogress: () => void;
+    status: boolean;
 }
 
 export type AutoResizeTextareaHandle = {

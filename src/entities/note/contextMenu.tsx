@@ -3,7 +3,7 @@ import {type PropContextMenu} from './model/types';
 const contextMenuConteiner = "flex flex-col items-stretch fixed z-50 w-[200px] h-fit rounded-[5px] overflow-hidden border border-[#1976d3]";
 const btnEditNote = "flex uppercase px-6 py-2 text-white bg-[#1976d3] font-[Roboto, sans-serif] text-xs font-medium transition-all duration-200 hover:bg-white  hover:text-[#1976d3] cursor-pointer";
 const btnDeleteNote = "flex uppercase px-6 py-2 text-white bg-[#1976d3] font-[Roboto, sans-serif] text-xs font-medium transition-all duration-200 hover:bg-white  hover:text-[#1976d3] cursor-pointer";
-export default function ContextMenu({x, y, menuRef, onEditNote, onDeleteNote}: PropContextMenu){
+export default function ContextMenu({x, y, menuRef, onEditNote, onDeleteNote, onSetStatusCompleted, onSetStatusInprogress, status}: PropContextMenu){
     return (
         <div 
             className={contextMenuConteiner}
@@ -16,6 +16,16 @@ export default function ContextMenu({x, y, menuRef, onEditNote, onDeleteNote}: P
             <button 
             onClick={onDeleteNote}
             className={btnDeleteNote}>Delete note</button>
+            {status ? <button
+            className={btnDeleteNote}
+            onClick={onSetStatusCompleted}>
+                In progress
+            </button> :  <button
+            className={btnDeleteNote}
+            onClick={onSetStatusInprogress}>
+                Completed
+            </button> }
+            
         </div>
     )
 }
