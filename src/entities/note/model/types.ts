@@ -46,7 +46,7 @@ export type NoteState = {
   note: Note[],
   title: string,
   text: string,
-  status: boolean,
+  status: 'inprogress' | 'completed',
 };
 
 export type NoteAction = 
@@ -87,8 +87,12 @@ export type NoteAction =
   payload: {id: string},
 }
 |{
-   type: 'SET_STATUS_COMPLETED',
+  type: 'SET_STATUS_COMPLETED',
   payload: {id: string},
+}
+|{
+  type: 'SET_FILTER',
+  payload: 'inprogress' | 'completed',
 };
 
 

@@ -23,15 +23,19 @@ const btnClose =
   "flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer";
 const arrContainer = "flex flex-col gap-[20px] px-[20px] w-full";
 
+const StatusWrapper = "flex flex-col   px-[30px] py-[10px] gap-[20px]";
+const StatusWrapperItem = "flex flex-col   px-[30px] py-[10px] gap-[10px] ";
+const StatusWrapperTitle = "text-black/50 text-[24px] font-[Roboto, sans-serif] font-normal px-[10px] border-b-[1px]"
+
 // item Note in progress
-const itemNote = "flex flex-col border-y-[1px]  bg-[#1976d3]/80 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]";
+const itemNote = "flex flex-col  bg-[#1976d3]/80 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]";
 const itemNoteHeader = "flex flex-col gap-[10px]";
 const itemNoteTitle = "text-white text-[32px] font-[Roboto, sans-serif] font-medium";
 const itemNoteContent = "text-white text-[16px] font-[Roboto, sans-serif] ";
 const itemNoteDate = "text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end";
 
 // item Note completed
-const itemNoteCompleted = "flex flex-col border-y-[1px]  bg-[#1976d3]/80 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]";
+const itemNoteCompleted = "flex flex-col   bg-black/25 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]";
 const itemNoteHeaderCompleted = "flex flex-col gap-[10px]";
 const itemNoteTitleCompleted = "text-white text-[32px] font-[Roboto, sans-serif] font-medium";
 const itemNoteContentCompleted = "text-white text-[16px] font-[Roboto, sans-serif] ";
@@ -46,7 +50,7 @@ const initialStateNote: NoteState = {
   note: [],
   title: "",
   text: "",
-  status: true,
+  status: 'inprogress',
 };
 
 function reducerNote(state: NoteState, action: NoteAction): NoteState {
@@ -136,7 +140,6 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
           ),
         ],
       };
-
     case "SET_STATUS_COMPLETED":
       return {
         ...state,
@@ -151,6 +154,11 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
           ),
         ],
       };
+    case "SET_FILTER":
+      return {
+        ...state,
+        status: action.payload,
+      }
   }
 }
 
@@ -362,22 +370,54 @@ export default function Note() {
         )}
       </div>
       <div className={arrContainer}>
+       
         {stateNote.note.length !== 0 ? (
-          stateNote.note.map((item) => (
-            <div
-              className={itemNote}
-              key={item.id}
-              onContextMenu={(e) => onContextMenu(e, item)}
-            >
-              <div className={itemNoteHeader}>
-                <h1 className={itemNoteTitle}>{item.title}</h1>
-                <h2 className={itemNoteContent}>{item.content}</h2>
-              </div>
-              <h3 className={itemNoteDate}>
-                {item.createdAt.toLocaleString()}
-              </h3>
+          <div className={StatusWrapper}>
+             <div className={StatusWrapperItem}>
+              <h2 className={StatusWrapperTitle}>In Progress</h2>
+              {stateNote.note
+              .filter(n => n.status === 'inprogress')
+              .map((item) => (
+                <div
+                  className={itemNote}
+                  key={item.id}
+                  onContextMenu={(e) => onContextMenu(e, item)}
+                >
+                  <div className={itemNoteHeader}>
+                    <h1 className={itemNoteTitle}>{item.title}</h1>
+                    <h2 className={itemNoteContent}>{item.content}</h2>
+                  </div>
+                  <h3 className={itemNoteDate}>
+                    {item.createdAt.toLocaleString()}
+                  </h3>
+                </div>
+                ))
+              }
             </div>
-          ))
+            <div className={StatusWrapperItem}>
+              <h2 className={StatusWrapperTitle}>Completed</h2>
+              {stateNote.note
+              .filter(n => n.status === 'completed')
+              .map((item) => (
+                <div
+                  className={itemNoteCompleted}
+                  key={item.id}
+                  onContextMenu={(e) => onContextMenu(e, item)}
+                >
+                  <div className={itemNoteHeaderCompleted}>
+                    <h1 className={itemNoteTitleCompleted}>{item.title}</h1>
+                    <h2 className={itemNoteContentCompleted}>{item.content}</h2>
+                  </div>
+                  <h3 className={itemNoteDateCompleted}>
+                    {item.createdAt.toLocaleString()}
+                  </h3>
+                </div>
+                ))
+              }
+            </div>
+          </div>
+         
+          
         ) : (
           <div className={arrEmpty}>
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
@@ -401,7 +441,7 @@ export default function Note() {
             onEditNote={() => onEditNote()}
             onSetStatusCompleted={() => onSetStatusCompleted(state.noteItem!)}
             onSetStatusInprogress={() => onSetStatusInprogress(state.noteItem!)}
-            status={state.noteItem.status === 'inprogress'}
+            status={state.noteItem.status === 'completed'}
           />
         ) : null}
       </div>

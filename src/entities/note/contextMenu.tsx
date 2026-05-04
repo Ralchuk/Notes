@@ -18,11 +18,11 @@ export default function ContextMenu({x, y, menuRef, onEditNote, onDeleteNote, on
             className={btnDeleteNote}>Delete note</button>
             {status ? <button
             className={btnDeleteNote}
-            onClick={onSetStatusCompleted}>
+            onClick={onSetStatusInprogress}>
                 In progress
             </button> :  <button
             className={btnDeleteNote}
-            onClick={onSetStatusInprogress}>
+            onClick={onSetStatusCompleted}>
                 Completed
             </button> }
             
