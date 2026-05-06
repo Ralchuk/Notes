@@ -10,8 +10,8 @@ import {
 } from "./model/types";
 import { useEffect, useRef, useReducer } from "react";
 
-const container = "flex flex-col items-center w-full min-h-screen";
-const noteContainer = "flex flex-col  pt-[10px] pb-[30px] gap-[15px] w-fit";
+const container = "flex flex-col items-center w-full  items-center min-h-screen";
+const noteHeader = "flex flex-col  pt-[10px] pb-[30px] gap-[15px]";
 const headerNote = "flex flex-col items-center gap-[15px] w-[350px]";
 const headerNoteBtn = "flex flex-row gap-[10px]";
 const btnCreate =
@@ -21,9 +21,11 @@ const btnClear =
 const formContainer = "flex flex-col gap-[10px] w-full";
 const btnClose =
   "flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer";
-const arrContainer = "flex flex-col gap-[20px] px-[20px] w-full";
 
-const StatusWrapper = "flex flex-col   px-[30px] py-[10px] gap-[20px]";
+const noteBody = "flex w-full flex-1"
+const sidebar = "flex flex-col flex-1 gap-[20px] px-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px]";
+
+const StatusWrapper = "flex flex-col   px-[30px]  gap-[20px]";
 const StatusWrapperItem = "flex flex-col   px-[30px] py-[10px] gap-[10px] ";
 const StatusWrapperTitle = "text-black/50 text-[24px] font-[Roboto, sans-serif] font-normal px-[10px] border-b-[1px]"
 
@@ -41,7 +43,7 @@ const itemNoteTitleCompleted = "text-white text-[32px] font-[Roboto, sans-serif]
 const itemNoteContentCompleted = "text-white text-[16px] font-[Roboto, sans-serif] ";
 const itemNoteDateCompleted = "text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end";
 
-const arrEmpty = "flex flex-col items-center opacity-50";
+const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
 
 // reducer для заметок
 
@@ -334,7 +336,7 @@ export default function Note() {
 
   return (
     <div className={container}>
-      <div className={noteContainer}>
+      <div className={noteHeader}>
         {stateNote.isOpen ? (
           <div className={headerNote}>
             <div className={headerNoteBtn}>
@@ -378,10 +380,10 @@ export default function Note() {
           </div>
         )}
       </div>
-      <div className={arrContainer}>
-       
-        {stateNote.note.length !== 0 ? (
-          <div className={StatusWrapper}>
+      <div className={noteBody}>
+        <div className={sidebar}>
+          {stateNote.note.length !== 0 ? (
+            <div className={StatusWrapper}>
              <div className={StatusWrapperItem}>
               <h2 className={StatusWrapperTitle}>In Progress</h2>
               {stateNote.note
@@ -425,8 +427,6 @@ export default function Note() {
               }
             </div>
           </div>
-         
-          
         ) : (
           <div className={arrEmpty}>
             <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
@@ -453,6 +453,7 @@ export default function Note() {
             status={state.noteItem.status === 'completed'}
           />
         ) : null}
+        </div>
       </div>
     </div>
   );
