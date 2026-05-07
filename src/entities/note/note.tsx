@@ -1,5 +1,7 @@
 import Form from "@/entities/note/form";
 import ContextMenu from "./contextMenu";
+import Sidebar from "./sidebar";
+
 import {
   type Note,
   type MenuAction,
@@ -10,8 +12,12 @@ import {
 } from "./model/types";
 import { useEffect, useRef, useReducer } from "react";
 
-const container = "flex flex-col items-center w-full  items-center min-h-screen";
+// main classes
+const container = "flex flex-col items-center w-full  items-center h-screen";
 const noteHeader = "flex flex-col  pt-[10px] pb-[30px] gap-[15px]";
+const noteBody = "flex w-full flex-1 h-screen overflow-hidden";
+
+// header
 const headerNote = "flex flex-col items-center gap-[15px] w-[350px]";
 const headerNoteBtn = "flex flex-row gap-[10px]";
 const btnCreate =
@@ -22,27 +28,9 @@ const formContainer = "flex flex-col gap-[10px] w-full";
 const btnClose =
   "flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer";
 
-const noteBody = "flex w-full flex-1"
-const sidebar = "flex flex-col flex-1 gap-[20px] px-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px]";
-
-const StatusWrapper = "flex flex-col   px-[30px]  gap-[20px]";
-const StatusWrapperItem = "flex flex-col   px-[30px] py-[10px] gap-[10px] ";
-const StatusWrapperTitle = "text-black/50 text-[24px] font-[Roboto, sans-serif] font-normal px-[10px] border-b-[1px]"
-
-// item Note in progress
-const itemNote = "flex flex-col  bg-[#1976d3]/80 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]";
-const itemNoteHeader = "flex flex-col gap-[10px]";
-const itemNoteTitle = "text-white text-[32px] font-[Roboto, sans-serif] font-medium";
-const itemNoteContent = "text-white text-[16px] font-[Roboto, sans-serif] ";
-const itemNoteDate = "text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end";
-
-// item Note completed
-const itemNoteCompleted = "flex flex-col   bg-black/25 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]";
-const itemNoteHeaderCompleted = "flex flex-col gap-[10px]";
-const itemNoteTitleCompleted = "text-white text-[32px] font-[Roboto, sans-serif] font-medium";
-const itemNoteContentCompleted = "text-white text-[16px] font-[Roboto, sans-serif] ";
-const itemNoteDateCompleted = "text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end";
-
+// sidebar
+const sidebarWrapper =
+  "flex flex-col flex-1 gap-[20px] px-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px] overflow-y-scroll";
 const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
 
 // reducer для заметок
@@ -52,7 +40,7 @@ const initialStateNote: NoteState = {
   note: [],
   title: "",
   text: "",
-  status: 'inprogress',
+  status: "inprogress",
 };
 
 function reducerNote(state: NoteState, action: NoteAction): NoteState {
@@ -82,7 +70,7 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
             createdAt: new Date(),
             content: action.payload.text,
             title: action.payload.title,
-            status: 'inprogress',
+            status: "inprogress",
           },
         ],
         title: "",
@@ -136,7 +124,7 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
             n.id === action.payload.id
               ? {
                   ...n,
-                  status: 'inprogress' as const,
+                  status: "inprogress" as const,
                 }
               : n,
           ),
@@ -150,7 +138,7 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
             n.id === action.payload.id
               ? {
                   ...n,
-                  status: 'completed' as const,
+                  status: "completed" as const,
                 }
               : n,
           ),
@@ -160,7 +148,7 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
       return {
         ...state,
         status: action.payload,
-      }
+      };
   }
 }
 
@@ -237,7 +225,7 @@ export default function Note() {
     if (!stateNote.title.trim() || !stateNote.text.trim()) return;
     if (state.noteItem) {
       dispatch({ type: "CLOSE_MENU" });
-       dispatchNote({
+      dispatchNote({
         type: "EDIT_NOTE",
         payload: {
           id: state.noteItem.id,
@@ -381,78 +369,51 @@ export default function Note() {
         )}
       </div>
       <div className={noteBody}>
-        <div className={sidebar}>
+        <div className={sidebarWrapper}>
           {stateNote.note.length !== 0 ? (
-            <div className={StatusWrapper}>
-             <div className={StatusWrapperItem}>
-              <h2 className={StatusWrapperTitle}>In Progress</h2>
-              {stateNote.note
-              .filter(n => n.status === 'inprogress')
-              .map((item) => (
-                <div
-                  className={itemNote}
-                  key={item.id}
-                  onContextMenu={(e) => onContextMenu(e, item)}
-                >
-                  <div className={itemNoteHeader}>
-                    <h1 className={itemNoteTitle}>{item.title}</h1>
-                    <h2 className={itemNoteContent}>{item.content}</h2>
-                  </div>
-                  <h3 className={itemNoteDate}>
-                    {item.createdAt.toLocaleString()}
-                  </h3>
-                </div>
-                ))
-              }
+            <Sidebar
+              SidebarProp={{
+                notes: stateNote.note,
+                onContextMenu: onContextMenu,
+                showTitle: stateNote.title,
+                setShowTitle: setTiTle,
+                showContent: stateNote.text,
+                setShowContent: setText,
+                onEditNote: onEditNote,
+                onDeleteNote: onDeleteNote,
+              }}
+            >
+              <Sidebar.FilterGroup />
+              <Sidebar.SidebarList />
+            </Sidebar>
+          ) : (
+            <div className={arrEmpty}>
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
+                  stroke="black"
+                  strokeWidth="1.5"
+                />
+                <path d="M9 12h6M9 16h4" stroke="black" strokeWidth="1.5" />
+              </svg>
+              <p>No notes yet</p>
+              <small>Click "Create" to add your first note</small>
             </div>
-            <div className={StatusWrapperItem}>
-              <h2 className={StatusWrapperTitle}>Completed</h2>
-              {stateNote.note
-              .filter(n => n.status === 'completed')
-              .map((item) => (
-                <div
-                  className={itemNoteCompleted}
-                  key={item.id}
-                  onContextMenu={(e) => onContextMenu(e, item)}
-                >
-                  <div className={itemNoteHeaderCompleted}>
-                    <h1 className={itemNoteTitleCompleted}>{item.title}</h1>
-                    <h2 className={itemNoteContentCompleted}>{item.content}</h2>
-                  </div>
-                  <h3 className={itemNoteDateCompleted}>
-                    {item.createdAt.toLocaleString()}
-                  </h3>
-                </div>
-                ))
+          )}
+          {state.isOpenMenu && state.coord && state.noteItem ? (
+            <ContextMenu
+              x={state.coord.x}
+              y={state.coord.y}
+              menuRef={menuRef}
+              onDeleteNote={() => onDeleteNote(state.noteItem!)}
+              onEditNote={() => onEditNote()}
+              onSetStatusCompleted={() => onSetStatusCompleted(state.noteItem!)}
+              onSetStatusInprogress={() =>
+                onSetStatusInprogress(state.noteItem!)
               }
-            </div>
-          </div>
-        ) : (
-          <div className={arrEmpty}>
-            <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-              <path
-                d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
-                stroke="black"
-                strokeWidth="1.5"
-              />
-              <path d="M9 12h6M9 16h4" stroke="black" strokeWidth="1.5" />
-            </svg>
-            <p>No notes yet</p>
-            <small>Click "Create" to add your first note</small>
-          </div>
-        )}
-        {state.isOpenMenu && state.coord && state.noteItem ? (
-          <ContextMenu
-            x={state.coord.x}
-            y={state.coord.y}
-            menuRef={menuRef}
-            onDeleteNote={() => onDeleteNote(state.noteItem!)}
-            onEditNote={() => onEditNote()}
-            onSetStatusCompleted={() => onSetStatusCompleted(state.noteItem!)}
-            onSetStatusInprogress={() => onSetStatusInprogress(state.noteItem!)}
-            status={state.noteItem.status === 'completed'}
-          />
-        ) : null}
+              status={state.noteItem.status === "completed"}
+            />
+          ) : null}
         </div>
       </div>
     </div>
