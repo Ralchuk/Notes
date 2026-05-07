@@ -1,6 +1,6 @@
-import Form from "@/entities/note/form";
-import ContextMenu from "./contextMenu";
-import Sidebar from "./sidebar";
+import Form from '@/entities/note/form';
+import ContextMenu from './contextMenu';
+import Sidebar from './sidebar';
 
 import {
   type Note,
@@ -9,146 +9,146 @@ import {
   type AutoResizeTextareaHandle,
   type NoteState,
   type NoteAction,
-} from "./model/types";
-import { useEffect, useRef, useReducer } from "react";
+} from './model/types';
+import { useEffect, useRef, useReducer } from 'react';
 
 // main classes
-const container = "flex flex-col items-center content-center w-full  items-center h-screen";
-const noteHeader = "flex flex-col w-full items-center pt-[30px] pb-[30px] gap-[15px] border-b border-[#1976d3]";
-const noteBody = "flex w-full flex-1 h-screen overflow-hidden ";
+const container = 'flex flex-col items-center content-center w-full  items-center h-screen';
+const noteHeader = 'flex flex-col w-full items-center pt-[30px] pb-[30px] gap-[15px] border-b border-[#1976d3]';
+const noteBody = 'flex w-full flex-1 h-screen overflow-hidden';
 
 // header
-const headerNote = "flex flex-col items-center  gap-[15px] w-[350px]";
-const headerNoteBtn = "flex flex-row gap-[10px]";
+const headerNote = 'flex flex-col items-center  gap-[15px] w-[350px]';
+const headerNoteBtn = 'flex flex-row gap-[10px]';
 const btnCreate =
-  "flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer";
+  'flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
 const btnClear =
-  "flex uppercase px-6 py-2 text-[#1976d3] bg-white border-[1px] border-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:border-[#1976d3]/50 hover:text-[#1976d3]/50 cursor-pointer";
-const formContainer = "flex flex-col gap-[10px] w-full";
+  'flex uppercase px-6 py-2 text-[#1976d3] bg-white border-[1px] border-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:border-[#1976d3]/50 hover:text-[#1976d3]/50 cursor-pointer';
+const formContainer = 'flex flex-col gap-[10px] w-full';
 const btnClose =
-  "flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer";
+  'flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
 
 // sidebar
 const sidebarWrapper =
-  "flex flex-col flex-1 gap-[50px] px-[20px] pt-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px] overflow-auto";
-const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
+  'flex flex-col flex-1 gap-[50px] px-[20px] pt-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px] overflow-auto';
+const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full';
 
 // reducer для заметок
 
 const initialStateNote: NoteState = {
   isOpen: false,
   note: [],
-  title: "",
-  text: "",
-  status: "inprogress",
+  title: '',
+  text: '',
+  status: 'inprogress',
 };
 
 function reducerNote(state: NoteState, action: NoteAction): NoteState {
   switch (action.type) {
-    case "OPEN_FORM":
-      return {
-        ...state,
-        isOpen: true,
-      };
-    case "SET_TITLE":
-      return {
-        ...state,
-        title: action.payload,
-      };
-    case "SET_TEXT":
-      return {
-        ...state,
-        text: action.payload,
-      };
-    case "SAVE_NOTE":
-      return {
-        ...state,
-        note: [
-          ...state.note,
-          {
-            id: Date.now().toString(),
-            createdAt: new Date(),
-            content: action.payload.text,
-            title: action.payload.title,
-            status: "inprogress",
-          },
-        ],
-        title: "",
-        text: "",
-        isOpen: false,
-      };
-    case "CLEAR_FORM":
-      return {
-        ...state,
-        title: "",
-        text: "",
-      };
-    case "CLOSE_FORM":
-      return {
-        ...state,
-        title: "",
-        text: "",
-        isOpen: false,
-      };
-    case "CLEAR_NOTES":
-      return {
-        ...state,
-        note: [],
-      };
-    case "DELETE_NOTE":
-      return {
-        ...state,
-        note: [...state.note.filter((n) => n.id !== action.payload.id)],
-      };
-    case "EDIT_NOTE":
-      return {
-        ...state,
-        note: [
-          ...state.note.map((n) =>
-            n.id === action.payload.id
-              ? {
-                  ...n,
-                  title: action.payload.title,
-                  content: action.payload.content,
-                  createdAt: action.payload.createdAt,
-                }
-              : n,
-          ),
-        ],
-      };
-    case "SET_STATUS_INPROGRESS":
-      return {
-        ...state,
-        note: [
-          ...state.note.map((n) =>
-            n.id === action.payload.id
-              ? {
-                  ...n,
-                  status: "inprogress" as const,
-                }
-              : n,
-          ),
-        ],
-      };
-    case "SET_STATUS_COMPLETED":
-      return {
-        ...state,
-        note: [
-          ...state.note.map((n) =>
-            n.id === action.payload.id
-              ? {
-                  ...n,
-                  status: "completed" as const,
-                }
-              : n,
-          ),
-        ],
-      };
-    case "SET_FILTER":
-      return {
-        ...state,
-        status: action.payload,
-      };
+  case 'OPEN_FORM':
+    return {
+      ...state,
+      isOpen: true,
+    };
+  case 'SET_TITLE':
+    return {
+      ...state,
+      title: action.payload,
+    };
+  case 'SET_TEXT':
+    return {
+      ...state,
+      text: action.payload,
+    };
+  case 'SAVE_NOTE':
+    return {
+      ...state,
+      note: [
+        ...state.note,
+        {
+          id: Date.now().toString(),
+          createdAt: new Date(),
+          content: action.payload.text,
+          title: action.payload.title,
+          status: 'inprogress',
+        },
+      ],
+      title: '',
+      text: '',
+      isOpen: false,
+    };
+  case 'CLEAR_FORM':
+    return {
+      ...state,
+      title: '',
+      text: '',
+    };
+  case 'CLOSE_FORM':
+    return {
+      ...state,
+      title: '',
+      text: '',
+      isOpen: false,
+    };
+  case 'CLEAR_NOTES':
+    return {
+      ...state,
+      note: [],
+    };
+  case 'DELETE_NOTE':
+    return {
+      ...state,
+      note: [...state.note.filter((n) => n.id !== action.payload.id)],
+    };
+  case 'EDIT_NOTE':
+    return {
+      ...state,
+      note: [
+        ...state.note.map((n) =>
+          n.id === action.payload.id
+            ? {
+              ...n,
+              title: action.payload.title,
+              content: action.payload.content,
+              createdAt: action.payload.createdAt,
+            }
+            : n,
+        ),
+      ],
+    };
+  case 'SET_STATUS_INPROGRESS':
+    return {
+      ...state,
+      note: [
+        ...state.note.map((n) =>
+          n.id === action.payload.id
+            ? {
+              ...n,
+              status: 'inprogress' as const,
+            }
+            : n,
+        ),
+      ],
+    };
+  case 'SET_STATUS_COMPLETED':
+    return {
+      ...state,
+      note: [
+        ...state.note.map((n) =>
+          n.id === action.payload.id
+            ? {
+              ...n,
+              status: 'completed' as const,
+            }
+            : n,
+        ),
+      ],
+    };
+  case 'SET_FILTER':
+    return {
+      ...state,
+      status: action.payload,
+    };
   }
 }
 
@@ -162,29 +162,29 @@ const initialState: MenuState = {
 
 function reducer(state: MenuState, action: MenuAction): MenuState {
   switch (action.type) {
-    case "OPEN_MENU":
-      return {
-        ...state,
-        isOpenMenu: true,
-        coord: action.payload.coord,
-        noteItem: action.payload.noteItem,
-      };
-    case "HIDE_MENU":
-      return {
-        ...state,
-        isOpenMenu: false,
-        coord: null,
-      };
-    case "CLOSE_MENU":
-      return {
-        ...state,
-        isOpenMenu: false,
-        coord: null,
-        noteItem: null,
-      };
+  case 'OPEN_MENU':
+    return {
+      ...state,
+      isOpenMenu: true,
+      coord: action.payload.coord,
+      noteItem: action.payload.noteItem,
+    };
+  case 'HIDE_MENU':
+    return {
+      ...state,
+      isOpenMenu: false,
+      coord: null,
+    };
+  case 'CLOSE_MENU':
+    return {
+      ...state,
+      isOpenMenu: false,
+      coord: null,
+      noteItem: null,
+    };
 
-    default:
-      return state;
+  default:
+    return state;
   }
 }
 
@@ -200,21 +200,21 @@ export default function Note() {
 
   function onCreate() {
     dispatchNote({
-      type: "SAVE_NOTE",
+      type: 'SAVE_NOTE',
       payload: { title: stateNote.title, text: stateNote.text },
     });
   }
 
   function setTiTle(value: string) {
     dispatchNote({
-      type: "SET_TITLE",
+      type: 'SET_TITLE',
       payload: value,
     });
   }
 
   function setText(value: string) {
     dispatchNote({
-      type: "SET_TEXT",
+      type: 'SET_TEXT',
       payload: value,
     });
   }
@@ -224,9 +224,9 @@ export default function Note() {
 
     if (!stateNote.title.trim() || !stateNote.text.trim()) return;
     if (state.noteItem) {
-      dispatch({ type: "CLOSE_MENU" });
+      dispatch({ type: 'CLOSE_MENU' });
       dispatchNote({
-        type: "EDIT_NOTE",
+        type: 'EDIT_NOTE',
         payload: {
           id: state.noteItem.id,
           title: stateNote.title,
@@ -237,16 +237,16 @@ export default function Note() {
     } else {
       onCreate();
     }
-    dispatchNote({ type: "CLOSE_FORM" });
+    dispatchNote({ type: 'CLOSE_FORM' });
   }
 
   function handleCleanNotes() {
-    dispatchNote({ type: "CLEAR_NOTES" });
+    dispatchNote({ type: 'CLEAR_NOTES' });
     // setNote([]);
   }
 
   function handleClearForm() {
-    dispatchNote({ type: "CLEAR_FORM" });
+    dispatchNote({ type: 'CLEAR_FORM' });
     // setTitle('');
     auto.current?.resetAndFocus();
   }
@@ -255,7 +255,7 @@ export default function Note() {
   function onContextMenu(e: React.MouseEvent<HTMLDivElement>, item: Note) {
     e.preventDefault();
     dispatch({
-      type: "OPEN_MENU",
+      type: 'OPEN_MENU',
       payload: {
         coord: { x: e.clientX, y: e.clientY },
         noteItem: item,
@@ -264,42 +264,42 @@ export default function Note() {
   }
 
   function onEditNote() {
-    dispatch({ type: "HIDE_MENU" });
-    dispatchNote({ type: "OPEN_FORM" });
+    dispatch({ type: 'HIDE_MENU' });
+    dispatchNote({ type: 'OPEN_FORM' });
     if (state.noteItem) {
       dispatchNote({
-        type: "SET_TITLE",
+        type: 'SET_TITLE',
         payload: state.noteItem?.title,
       });
       dispatchNote({
-        type: "SET_TEXT",
+        type: 'SET_TEXT',
         payload: state.noteItem?.content,
       });
     }
   }
 
   function onDeleteNote(item: Note) {
-    dispatch({ type: "CLOSE_MENU" });
+    dispatch({ type: 'CLOSE_MENU' });
     dispatchNote({
-      type: "DELETE_NOTE",
+      type: 'DELETE_NOTE',
       payload: { id: item.id },
     });
   }
 
   function onSetStatusCompleted(item: Note) {
     dispatchNote({
-      type: "SET_STATUS_COMPLETED",
+      type: 'SET_STATUS_COMPLETED',
       payload: { id: item.id },
     });
-    dispatch({ type: "CLOSE_MENU" });
+    dispatch({ type: 'CLOSE_MENU' });
   }
 
   function onSetStatusInprogress(item: Note) {
     dispatchNote({
-      type: "SET_STATUS_INPROGRESS",
+      type: 'SET_STATUS_INPROGRESS',
       payload: { id: item.id },
     });
-    dispatch({ type: "CLOSE_MENU" });
+    dispatch({ type: 'CLOSE_MENU' });
   }
 
   // Закриття контекстного меню
@@ -310,15 +310,15 @@ export default function Note() {
 
     function onCloseMenu(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        console.log("Close menu");
-        dispatch({ type: "CLOSE_MENU" });
+        console.log('Close menu');
+        dispatch({ type: 'CLOSE_MENU' });
       }
     }
 
-    document.addEventListener("click", onCloseMenu);
+    document.addEventListener('click', onCloseMenu);
 
     return () => {
-      document.removeEventListener("click", onCloseMenu);
+      document.removeEventListener('click', onCloseMenu);
     };
   }, [state.isOpenMenu]);
 
@@ -346,7 +346,7 @@ export default function Note() {
               />
               <button
                 className={btnClose}
-                onClick={() => dispatchNote({ type: "CLOSE_FORM" })}
+                onClick={() => dispatchNote({ type: 'CLOSE_FORM' })}
               >
                 Close
               </button>
@@ -357,7 +357,7 @@ export default function Note() {
             <div className={headerNoteBtn}>
               <button
                 className={btnCreate}
-                onClick={() => dispatchNote({ type: "OPEN_FORM" })}
+                onClick={() => dispatchNote({ type: 'OPEN_FORM' })}
               >
                 Create
               </button>
@@ -407,7 +407,7 @@ export default function Note() {
               onSetStatusInprogress={() =>
                 onSetStatusInprogress(state.noteItem!)
               }
-              status={state.noteItem.status === "completed"}
+              status={state.noteItem.status === 'completed'}
             />
           ) : null}
         </div>
