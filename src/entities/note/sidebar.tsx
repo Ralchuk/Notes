@@ -1,4 +1,4 @@
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useId } from "react";
 import { type Note } from "./model/types";
 
 const sidebar = "flex flex-col flex-1 gap-[30px] w-full ";
@@ -12,9 +12,9 @@ const filterCheckbox = "flex flex-row";
 const checkboxItem = "flex";
 const checkboxInput = "appearance-none peer";
 const checkboxBtnProgress =
-  "uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] rounded-l-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white ";
+  "cursor-pointer uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] rounded-l-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white ";
 const checkboxBtnCompleted =
-  "uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] border-l-0 rounded-r-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white ";
+  "cursor-pointer uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] border-l-0 rounded-r-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white ";
 
 const inputTitle =
   "w-[300px] px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:italic focus:placeholder-transparent";
@@ -47,33 +47,34 @@ const itemNoteDateCompleted =
 
 const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
 
-type SidebarContextType = {
+type SidebarProp = {
   notes: Note[];
   onContextMenu: (e: React.MouseEvent<HTMLDivElement>, item: Note) => void;
   onEditNote: () => void;
   onDeleteNote: (item: Note) => void;
 };
 
-type SidebarProp = {
-    notes: Note[];
-    onContextMenu: (e: React.MouseEvent<HTMLDivElement>, item: Note) => void;
-    showTitle: string;
-    setShowTitle: (value: string) => void;
-    showContent: string;
-    setShowContent: (value: string) => void;
-    filterStatus: "inprogress" | "completed";
-    setFilterStatus: (value: "inprogress" | "completed") => void;
-    onEditNote: () => void;
-    onDeleteNote: (item: Note) => void;
-}
+type SidebarContextType = {
+  notes: Note[];
+  onContextMenu: (e: React.MouseEvent<HTMLDivElement>, item: Note) => void;
+  showTitle: string;
+  setShowTitle: (value: string) => void;
+  showContent: string;
+  setShowContent: (value: string) => void;
+  filterStatus: "inprogress" | "completed";
+  setFilterStatus: (value: "inprogress" | "completed") => void;
+  onEditNote: () => void;
+  onDeleteNote: (item: Note) => void;
+  id: string;
+};
 
-const SidebarContext = createContext<SidebarProp| null>(null);
+const SidebarContext = createContext<SidebarContextType | null>(null);
 
 const SidebarComponent = ({
   SidebarProp,
   children,
 }: {
-  SidebarProp: SidebarContextType;
+  SidebarProp: SidebarProp;
   children: React.ReactNode;
 }) => {
   const [showTitle, setShowTitle] = useState("");
@@ -81,6 +82,7 @@ const SidebarComponent = ({
   const [filterStatus, setFilterStatus] = useState<"inprogress" | "completed">(
     "inprogress",
   );
+  const id = useId();
   return (
     <SidebarContext.Provider
       value={{
@@ -91,6 +93,7 @@ const SidebarComponent = ({
         setShowContent,
         filterStatus,
         setFilterStatus,
+        id,
       }}
     >
       {children}
@@ -107,24 +110,25 @@ const SidebarFilterGroup = () => {
     showContent,
     setShowContent,
     setFilterStatus,
+    id,
   } = context;
   return (
     <div className={filter}>
       <h2 className={filterTitle}>Filter</h2>
       <div className={filterInput}>
-        <label htmlFor="inputfiltrTitle">Title</label>
+        <label htmlFor={`${id}-title`}>Title</label>
         <input
           className={inputTitle}
           type="text"
-          id="inputfiltrTitle"
+          id={`${id}-title`}
           value={showTitle}
           onChange={(e) => setShowTitle(e.target.value)}
         />
-        <label htmlFor="inputfiltrContent">Content</label>
+        <label htmlFor={`${id}-content`}>Content</label>
         <input
           className={inputTitle}
           type="text"
-          id="inputfiltrContent"
+          id={`${id}-content`}
           value={showContent}
           onChange={(e) => setShowContent(e.target.value)}
         />
@@ -139,12 +143,12 @@ const SidebarFilterGroup = () => {
             type="radio"
             name="status"
             className={checkboxInput}
-            id="btncheck1"
+            id={`${id}-inprogress`}
             autoComplete="off"
             defaultChecked
             onChange={() => setFilterStatus("inprogress")}
           />
-          <label className={checkboxBtnProgress} htmlFor="btncheck1">
+          <label className={checkboxBtnProgress} htmlFor={`${id}-inprogress`}>
             In Progress
           </label>
         </div>
@@ -153,11 +157,11 @@ const SidebarFilterGroup = () => {
             type="radio"
             name="status"
             className={checkboxInput}
-            id="btncheck2"
+            id={`${id}-completed`}
             autoComplete="off"
             onChange={() => setFilterStatus("completed")}
           />
-          <label className={checkboxBtnCompleted} htmlFor="btncheck2">
+          <label className={checkboxBtnCompleted} htmlFor={`${id}-completed`}>
             Checkbox 2
           </label>
         </div>
@@ -169,13 +173,8 @@ const SidebarFilterGroup = () => {
 const SidebarList = () => {
   const context = useContext(SidebarContext);
   if (context == null) return;
-  const {
-    notes,
-    onContextMenu,
-    showTitle,
-    showContent,
-    filterStatus,
-  } = context;
+  const { notes, onContextMenu, showTitle, showContent, filterStatus } =
+    context;
   return (
     <div className={sidebar}>
       {notes.length !== 0 ? (
