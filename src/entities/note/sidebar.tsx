@@ -1,80 +1,80 @@
-import { useContext, createContext, useId, useReducer } from "react";
+import { useContext, createContext, useId, useReducer } from 'react';
 import {
   type SiderbarState,
   type SidebarAction,
   type SidebarProp,
   type SidebarContextType,
-} from "./model/types";
+} from './model/types';
 
-const sidebar = "flex flex-col flex-1 gap-[30px] w-full ";
+const sidebar = 'flex flex-col flex-1 gap-[30px] w-full';
 
 // filters
-const filter = "flex flex-col gap-[20px] ";
+const filter = 'flex flex-col gap-[20px]';
 const filterTitle =
-  "font-[Roboto, sans-serif] font-medium text-[24px] text-black/50";
-const filterInput = "flex flex-col gap-[5px]";
-const filterCheckbox = "flex flex-row";
-const checkboxItem = "flex";
-const checkboxInput = "appearance-none peer";
+  'font-[Roboto, sans-serif] font-medium text-[24px] text-black/50';
+const filterInput = 'flex flex-col gap-[5px]';
+const filterCheckbox = 'flex flex-row';
+const checkboxItem = 'flex';
+const checkboxInput = 'appearance-none peer';
 const checkboxBtnProgress =
-  "cursor-pointer uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] rounded-l-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white ";
+  'cursor-pointer uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] rounded-l-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white';
 const checkboxBtnCompleted =
-  "cursor-pointer uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] border-l-0 rounded-r-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white ";
+  'cursor-pointer uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] border-l-0 rounded-r-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white';
 
 const inputTitle =
-  "w-[300px] px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:text-gray-400 focus:placeholder-transparent";
+  'w-[300px] px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:text-gray-400 focus:placeholder-transparent';
 
-const StatusWrapper = "flex flex-col gap-[20px]";
-const StatusWrapperItem = "flex flex-col  py-[10px] gap-[10px] ";
+const StatusWrapper = 'flex flex-col gap-[20px]';
+const StatusWrapperItem = 'flex flex-col  py-[10px] gap-[10px]';
 const StatusWrapperTitle =
-  "text-black/50 text-[24px] font-[Roboto, sans-serif] font-normal px-[10px] border-b-[1px]";
+  'text-black/50 text-[24px] font-[Roboto, sans-serif] font-normal px-[10px] border-b-[1px]';
 
 // item Note in progress
 const itemNote =
-  "flex flex-col  bg-[#1976d3]/80 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]";
-const itemNoteHeader = "flex flex-col gap-[10px]";
+  'flex flex-col  bg-[#1976d3]/80 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]';
+const itemNoteHeader = 'flex flex-col gap-[10px]';
 const itemNoteTitle =
-  "text-white text-[32px] font-[Roboto, sans-serif] font-medium";
-const itemNoteContent = "text-white text-[16px] font-[Roboto, sans-serif] ";
+  'text-white text-[32px] font-[Roboto, sans-serif] font-medium';
+const itemNoteContent = 'text-white text-[16px] font-[Roboto, sans-serif]';
 const itemNoteDate =
-  "text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end";
+  'text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
 
 // item Note completed
 const itemNoteCompleted =
-  "flex flex-col   bg-black/25 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]";
-const itemNoteHeaderCompleted = "flex flex-col gap-[10px]";
+  'flex flex-col   bg-black/25 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]';
+const itemNoteHeaderCompleted = 'flex flex-col gap-[10px]';
 const itemNoteTitleCompleted =
-  "text-white text-[32px] font-[Roboto, sans-serif] font-medium";
+  'text-white text-[32px] font-[Roboto, sans-serif] font-medium';
 const itemNoteContentCompleted =
-  "text-white text-[16px] font-[Roboto, sans-serif] ";
+  'text-white text-[16px] font-[Roboto, sans-serif]';
 const itemNoteDateCompleted =
-  "text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end";
+  'text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
 
-const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
+const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full';
 
 const InitialSidebarState: SiderbarState = {
-  showTitle: "",
-  showContent: "",
-  filterStatus: "inprogress",
+  showTitle: '',
+  showContent: '',
+  filterStatus: 'inprogress',
 };
 
 function reduceSidebar(state: SiderbarState, action: SidebarAction) {
   switch (action.type) {
-    case "SEARCHING_BY_TITLE":
-      return {
-        ...state,
-        showTitle: action.payload,
-      };
-    case "SEARCHING_BY_CONTENT":
-      return {
-        ...state,
-        showContent: action.payload,
-      };
-    case "TOGGLE_STATUS":
-      return {
-        ...state,
-        filterStatus: action.payload,
-      };
+  case 'SEARCHING_BY_TITLE':
+    return {
+      ...state,
+      showTitle: action.payload,
+    };
+  case 'SEARCHING_BY_CONTENT':
+    return {
+      ...state,
+      showContent: action.payload,
+    };
+  case 'TOGGLE_STATUS':
+    return {
+      ...state,
+      filterStatus: action.payload,
+    };
   }
 }
 
@@ -124,7 +124,7 @@ const SidebarFilterGroup = () => {
           value={stateSidebar.showTitle}
           onChange={(e) =>
             dispatchSidebar({
-              type: "SEARCHING_BY_TITLE",
+              type: 'SEARCHING_BY_TITLE',
               payload: e.target.value,
             })
           }
@@ -138,7 +138,7 @@ const SidebarFilterGroup = () => {
           value={stateSidebar.showContent}
           onChange={(e) =>
             dispatchSidebar({
-              type: "SEARCHING_BY_CONTENT",
+              type: 'SEARCHING_BY_CONTENT',
               payload: e.target.value,
             })
           }
@@ -158,7 +158,7 @@ const SidebarFilterGroup = () => {
             autoComplete="off"
             defaultChecked
             onChange={() =>
-              dispatchSidebar({ type: "TOGGLE_STATUS", payload: "inprogress" })
+              dispatchSidebar({ type: 'TOGGLE_STATUS', payload: 'inprogress' })
             }
           />
           <label className={checkboxBtnProgress} htmlFor={`${id}-inprogress`}>
@@ -173,7 +173,7 @@ const SidebarFilterGroup = () => {
             id={`${id}-completed`}
             autoComplete="off"
             onChange={() =>
-              dispatchSidebar({ type: "TOGGLE_STATUS", payload: "completed" })
+              dispatchSidebar({ type: 'TOGGLE_STATUS', payload: 'completed' })
             }
           />
           <label className={checkboxBtnCompleted} htmlFor={`${id}-completed`}>
@@ -193,13 +193,13 @@ const SidebarList = () => {
     <div className={sidebar}>
       {notes.length !== 0 ? (
         <div className={StatusWrapper}>
-          {stateSidebar.filterStatus === "inprogress" && (
+          {stateSidebar.filterStatus === 'inprogress' && (
             <div className={StatusWrapperItem}>
               <h2 className={StatusWrapperTitle}>In Progress</h2>
               {notes
                 .filter(
                   (n) =>
-                    n.status === "inprogress" &&
+                    n.status === 'inprogress' &&
                     n.title.includes(stateSidebar.showTitle) &&
                     n.content.includes(stateSidebar.showContent),
                 )
@@ -220,13 +220,13 @@ const SidebarList = () => {
                 ))}
             </div>
           )}
-          {stateSidebar.filterStatus === "completed" && (
+          {stateSidebar.filterStatus === 'completed' && (
             <div className={StatusWrapperItem}>
               <h2 className={StatusWrapperTitle}>Completed</h2>
               {notes
                 .filter(
                   (n) =>
-                    n.status === "completed" &&
+                    n.status === 'completed' &&
                     n.title.includes(stateSidebar.showTitle) &&
                     n.content.includes(stateSidebar.showContent),
                 )

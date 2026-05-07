@@ -20,19 +20,19 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-  // кавычки
+  
   'quotes': ['error', 'single'],
 
-  // точка с запятой
+ 
   'semi': ['error', 'always'],
 
-  // отступы (по желанию)
+  
   'indent': ['error', 2],
 
-  // пробелы
+ 
   'space-before-function-paren': ['error', 'never'],
 
-  // перенос строки
+  
   'eol-last': ['error', 'always'],
 }
   },

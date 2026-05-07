@@ -116,21 +116,21 @@ export type AutoResizeTextareaHandle = {
 export type SiderbarState = {
   showTitle: string;
   showContent: string;
-  filterStatus: "inprogress" | "completed";
+  filterStatus: 'inprogress' | 'completed';
 };
 
 export type SidebarAction =
   | {
-      type: "SEARCHING_BY_TITLE";
+      type: 'SEARCHING_BY_TITLE';
       payload: string;
     }
   | {
-      type: "SEARCHING_BY_CONTENT";
+      type: 'SEARCHING_BY_CONTENT';
       payload: string;
     }
   | {
-      type: "TOGGLE_STATUS";
-      payload: "inprogress" | "completed";
+      type: 'TOGGLE_STATUS';
+      payload: 'inprogress' | 'completed'
     };
 
 export type SidebarProp = {
