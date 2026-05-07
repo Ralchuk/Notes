@@ -1,5 +1,10 @@
-import { useContext, createContext, useState, useId } from "react";
-import { type Note } from "./model/types";
+import { useContext, createContext, useId, useReducer } from "react";
+import {
+  type SiderbarState,
+  type SidebarAction,
+  type SidebarProp,
+  type SidebarContextType,
+} from "./model/types";
 
 const sidebar = "flex flex-col flex-1 gap-[30px] w-full ";
 
@@ -47,26 +52,31 @@ const itemNoteDateCompleted =
 
 const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
 
-type SidebarProp = {
-  notes: Note[];
-  onContextMenu: (e: React.MouseEvent<HTMLDivElement>, item: Note) => void;
-  onEditNote: () => void;
-  onDeleteNote: (item: Note) => void;
+const InitialSidebarState: SiderbarState = {
+  showTitle: "",
+  showContent: "",
+  filterStatus: "inprogress",
 };
 
-type SidebarContextType = {
-  notes: Note[];
-  onContextMenu: (e: React.MouseEvent<HTMLDivElement>, item: Note) => void;
-  showTitle: string;
-  setShowTitle: (value: string) => void;
-  showContent: string;
-  setShowContent: (value: string) => void;
-  filterStatus: "inprogress" | "completed";
-  setFilterStatus: (value: "inprogress" | "completed") => void;
-  onEditNote: () => void;
-  onDeleteNote: (item: Note) => void;
-  id: string;
-};
+function reduceSidebar(state: SiderbarState, action: SidebarAction) {
+  switch (action.type) {
+    case "SEARCHING_BY_TITLE":
+      return {
+        ...state,
+        showTitle: action.payload,
+      };
+    case "SEARCHING_BY_CONTENT":
+      return {
+        ...state,
+        showContent: action.payload,
+      };
+    case "TOGGLE_STATUS":
+      return {
+        ...state,
+        filterStatus: action.payload,
+      };
+  }
+}
 
 const SidebarContext = createContext<SidebarContextType | null>(null);
 
@@ -77,22 +87,18 @@ const SidebarComponent = ({
   SidebarProp: SidebarProp;
   children: React.ReactNode;
 }) => {
-  const [showTitle, setShowTitle] = useState("");
-  const [showContent, setShowContent] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"inprogress" | "completed">(
-    "inprogress",
+  const [stateSidebar, dispatchSidebar] = useReducer(
+    reduceSidebar,
+    InitialSidebarState,
   );
+
   const id = useId();
   return (
     <SidebarContext.Provider
       value={{
         ...SidebarProp,
-        showTitle,
-        setShowTitle,
-        showContent,
-        setShowContent,
-        filterStatus,
-        setFilterStatus,
+        stateSidebar,
+        dispatchSidebar,
         id,
       }}
     >
@@ -104,35 +110,38 @@ const SidebarComponent = ({
 const SidebarFilterGroup = () => {
   const context = useContext(SidebarContext);
   if (context === null) return;
-  const {
-    showTitle,
-    setShowTitle,
-    showContent,
-    setShowContent,
-    setFilterStatus,
-    id,
-  } = context;
+  const { stateSidebar, dispatchSidebar, id } = context;
   return (
     <div className={filter}>
       <h2 className={filterTitle}>Filter</h2>
       <div className={filterInput}>
-        <label htmlFor={`${id}-title`}/>
+        <label htmlFor={`${id}-title`} />
         <input
           className={inputTitle}
           placeholder="Searching by title..."
           type="text"
           id={`${id}-title`}
-          value={showTitle}
-          onChange={(e) => setShowTitle(e.target.value)}
+          value={stateSidebar.showTitle}
+          onChange={(e) =>
+            dispatchSidebar({
+              type: "SEARCHING_BY_TITLE",
+              payload: e.target.value,
+            })
+          }
         />
-        <label htmlFor={`${id}-content`}/>
+        <label htmlFor={`${id}-content`} />
         <input
           className={inputTitle}
           placeholder="Searching by content..."
           type="text"
           id={`${id}-content`}
-          value={showContent}
-          onChange={(e) => setShowContent(e.target.value)}
+          value={stateSidebar.showContent}
+          onChange={(e) =>
+            dispatchSidebar({
+              type: "SEARCHING_BY_CONTENT",
+              payload: e.target.value,
+            })
+          }
         />
       </div>
       <div
@@ -148,7 +157,9 @@ const SidebarFilterGroup = () => {
             id={`${id}-inprogress`}
             autoComplete="off"
             defaultChecked
-            onChange={() => setFilterStatus("inprogress")}
+            onChange={() =>
+              dispatchSidebar({ type: "TOGGLE_STATUS", payload: "inprogress" })
+            }
           />
           <label className={checkboxBtnProgress} htmlFor={`${id}-inprogress`}>
             In Progress
@@ -161,7 +172,9 @@ const SidebarFilterGroup = () => {
             className={checkboxInput}
             id={`${id}-completed`}
             autoComplete="off"
-            onChange={() => setFilterStatus("completed")}
+            onChange={() =>
+              dispatchSidebar({ type: "TOGGLE_STATUS", payload: "completed" })
+            }
           />
           <label className={checkboxBtnCompleted} htmlFor={`${id}-completed`}>
             Completed
@@ -175,21 +188,20 @@ const SidebarFilterGroup = () => {
 const SidebarList = () => {
   const context = useContext(SidebarContext);
   if (context == null) return;
-  const { notes, onContextMenu, showTitle, showContent, filterStatus } =
-    context;
+  const { notes, onContextMenu, stateSidebar } = context;
   return (
     <div className={sidebar}>
       {notes.length !== 0 ? (
         <div className={StatusWrapper}>
-          {filterStatus === "inprogress" && (
+          {stateSidebar.filterStatus === "inprogress" && (
             <div className={StatusWrapperItem}>
               <h2 className={StatusWrapperTitle}>In Progress</h2>
               {notes
                 .filter(
                   (n) =>
                     n.status === "inprogress" &&
-                    n.title.includes(showTitle) &&
-                    n.content.includes(showContent),
+                    n.title.includes(stateSidebar.showTitle) &&
+                    n.content.includes(stateSidebar.showContent),
                 )
                 .map((item) => (
                   <div
@@ -208,15 +220,15 @@ const SidebarList = () => {
                 ))}
             </div>
           )}
-          {filterStatus === "completed" && (
+          {stateSidebar.filterStatus === "completed" && (
             <div className={StatusWrapperItem}>
               <h2 className={StatusWrapperTitle}>Completed</h2>
               {notes
                 .filter(
                   (n) =>
                     n.status === "completed" &&
-                    n.title.includes(showTitle) &&
-                    n.content.includes(showContent),
+                    n.title.includes(stateSidebar.showTitle) &&
+                    n.content.includes(stateSidebar.showContent),
                 )
                 .map((item) => (
                   <div

@@ -110,3 +110,38 @@ export type PropContextMenu = {
 export type AutoResizeTextareaHandle = {
   resetAndFocus: () => void;
 };
+
+// Sidebar
+
+export type SiderbarState = {
+  showTitle: string;
+  showContent: string;
+  filterStatus: "inprogress" | "completed";
+};
+
+export type SidebarAction =
+  | {
+      type: "SEARCHING_BY_TITLE";
+      payload: string;
+    }
+  | {
+      type: "SEARCHING_BY_CONTENT";
+      payload: string;
+    }
+  | {
+      type: "TOGGLE_STATUS";
+      payload: "inprogress" | "completed";
+    };
+
+export type SidebarProp = {
+  notes: Note[];
+  onContextMenu: (e: React.MouseEvent<HTMLDivElement>, item: Note) => void;
+  onEditNote: () => void;
+  onDeleteNote: (item: Note) => void;
+};
+
+export type SidebarContextType = SidebarProp & {
+  stateSidebar: SiderbarState;
+  dispatchSidebar: React.Dispatch<SidebarAction>;
+  id: string;
+};
