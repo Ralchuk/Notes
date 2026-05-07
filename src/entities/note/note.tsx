@@ -30,7 +30,7 @@ const btnClose =
 
 // sidebar
 const sidebarWrapper =
-  "flex flex-col flex-1 gap-[20px] px-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px] overflow-y-scroll";
+  "flex flex-col flex-1 gap-[50px] px-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px] overflow-y-scroll";
 const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
 
 // reducer для заметок
