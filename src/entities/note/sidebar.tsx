@@ -4,10 +4,10 @@ import { type Note } from "./model/types";
 const sidebar = "flex flex-col flex-1 gap-[30px] w-full ";
 
 // filters
-const filter = "flex flex-col gap-[25px] ";
+const filter = "flex flex-col gap-[20px] ";
 const filterTitle =
   "font-[Roboto, sans-serif] font-medium text-[24px] text-black/50";
-const filterInput = "flex flex-col";
+const filterInput = "flex flex-col gap-[5px]";
 const filterCheckbox = "flex flex-row";
 const checkboxItem = "flex";
 const checkboxInput = "appearance-none peer";
@@ -17,7 +17,7 @@ const checkboxBtnCompleted =
   "cursor-pointer uppercase font-[Roboto, sans-serif] text-[#1976d3] font-medium transition-all duration-200 px-[20px] py-[10px] bg-white border-[1px] border-l-0 rounded-r-[10px] border-[#1976d3] peer-checked:bg-[#1976d3] peer-checked:text-white ";
 
 const inputTitle =
-  "w-[300px] px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:italic focus:placeholder-transparent";
+  "w-[300px] px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:text-gray-400 focus:placeholder-transparent";
 
 const StatusWrapper = "flex flex-col gap-[20px]";
 const StatusWrapperItem = "flex flex-col  py-[10px] gap-[10px] ";
@@ -116,17 +116,19 @@ const SidebarFilterGroup = () => {
     <div className={filter}>
       <h2 className={filterTitle}>Filter</h2>
       <div className={filterInput}>
-        <label htmlFor={`${id}-title`}>Title</label>
+        <label htmlFor={`${id}-title`}/>
         <input
           className={inputTitle}
+          placeholder="Searching by title..."
           type="text"
           id={`${id}-title`}
           value={showTitle}
           onChange={(e) => setShowTitle(e.target.value)}
         />
-        <label htmlFor={`${id}-content`}>Content</label>
+        <label htmlFor={`${id}-content`}/>
         <input
           className={inputTitle}
+          placeholder="Searching by content..."
           type="text"
           id={`${id}-content`}
           value={showContent}
@@ -162,7 +164,7 @@ const SidebarFilterGroup = () => {
             onChange={() => setFilterStatus("completed")}
           />
           <label className={checkboxBtnCompleted} htmlFor={`${id}-completed`}>
-            Checkbox 2
+            Completed
           </label>
         </div>
       </div>

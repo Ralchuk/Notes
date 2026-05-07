@@ -13,12 +13,12 @@ import {
 import { useEffect, useRef, useReducer } from "react";
 
 // main classes
-const container = "flex flex-col items-center w-full  items-center h-screen";
-const noteHeader = "flex flex-col  pt-[10px] pb-[30px] gap-[15px]";
-const noteBody = "flex w-full flex-1 h-screen overflow-hidden";
+const container = "flex flex-col items-center content-center w-full  items-center h-screen";
+const noteHeader = "flex flex-col w-full items-center pt-[30px] pb-[30px] gap-[15px] border-b border-[#1976d3]";
+const noteBody = "flex w-full flex-1 h-screen overflow-hidden ";
 
 // header
-const headerNote = "flex flex-col items-center gap-[15px] w-[350px]";
+const headerNote = "flex flex-col items-center  gap-[15px] w-[350px]";
 const headerNoteBtn = "flex flex-row gap-[10px]";
 const btnCreate =
   "flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer";
@@ -30,7 +30,7 @@ const btnClose =
 
 // sidebar
 const sidebarWrapper =
-  "flex flex-col flex-1 gap-[50px] px-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px] overflow-y-scroll";
+  "flex flex-col flex-1 gap-[50px] px-[20px] pt-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px] overflow-auto";
 const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
 
 // reducer для заметок
