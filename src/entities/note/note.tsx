@@ -375,10 +375,6 @@ export default function Note() {
               SidebarProp={{
                 notes: stateNote.note,
                 onContextMenu: onContextMenu,
-                showTitle: stateNote.title,
-                setShowTitle: setTiTle,
-                showContent: stateNote.text,
-                setShowContent: setText,
                 onEditNote: onEditNote,
                 onDeleteNote: onDeleteNote,
               }}

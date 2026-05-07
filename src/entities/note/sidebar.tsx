@@ -50,17 +50,24 @@ const arrEmpty = "flex flex-col items-center justify-center opacity-50 h-full";
 type SidebarContextType = {
   notes: Note[];
   onContextMenu: (e: React.MouseEvent<HTMLDivElement>, item: Note) => void;
-  showTitle: string;
-  setShowTitle: (value: string) => void;
-  showContent: string;
-  setShowContent: (value: string) => void;
-  filterStatus: "inprogress" | "completed";
-  setFilterStatus: (value: "inprogress" | "completed") => void;
   onEditNote: () => void;
   onDeleteNote: (item: Note) => void;
 };
 
-const SidebarContext = createContext<SidebarContextType | null>(null);
+type SidebarProp = {
+    notes: Note[];
+    onContextMenu: (e: React.MouseEvent<HTMLDivElement>, item: Note) => void;
+    showTitle: string;
+    setShowTitle: (value: string) => void;
+    showContent: string;
+    setShowContent: (value: string) => void;
+    filterStatus: "inprogress" | "completed";
+    setFilterStatus: (value: "inprogress" | "completed") => void;
+    onEditNote: () => void;
+    onDeleteNote: (item: Note) => void;
+}
+
+const SidebarContext = createContext<SidebarProp| null>(null);
 
 const SidebarComponent = ({
   SidebarProp,
