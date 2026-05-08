@@ -27,7 +27,7 @@ export default defineConfig([
   'semi': ['error', 'always'],
 
   
-  'indent': ['error', 2],
+  'indent': ['error', 'tab'],
 
  
   'space-before-function-paren': ['error', 'never'],
