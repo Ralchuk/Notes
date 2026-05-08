@@ -344,6 +344,7 @@ export default function Note() {
           />
           <div className='flex justify-center gap-[10px]'>
             <button 
+              autoFocus
               className={btnCreate} 
               type="submit" 
               form="note-form"
