@@ -9,7 +9,7 @@ interface AccordionContextType {
 const AccordionContext = createContext<AccordionContextType | null>(null);
 
 const useAccordionContext = () => {
-const context = useContext(AccordionContext);
+  const context = useContext(AccordionContext);
   if (context === null) 
     throw new Error('useAccordionContext must be inside Accorion');
   return context;
