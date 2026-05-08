@@ -1,6 +1,7 @@
 import Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
 import Sidebar from './sidebar';
+import ModalWrapper from '../modalForm';
 
 import {
   type Note,
@@ -24,9 +25,9 @@ const btnCreate =
   'flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
 const btnClear =
   'flex uppercase px-6 py-2 text-[#1976d3] bg-white border-[1px] border-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:border-[#1976d3]/50 hover:text-[#1976d3]/50 cursor-pointer';
-const formContainer = 'flex flex-col gap-[10px] w-full';
-const btnClose =
-  'flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
+// const formContainer = 'flex flex-col gap-[10px] w-full';
+// const btnClose =
+//   'flex self-center uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium w-fit transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
 
 // sidebar
 const sidebarWrapper =
@@ -203,6 +204,14 @@ export default function Note() {
       type: 'SAVE_NOTE',
       payload: { title: stateNote.title, text: stateNote.text },
     });
+  };
+
+  function onClose(){
+    dispatchNote({type: 'CLOSE_FORM'});
+  }
+
+  function onOpen(){
+    dispatchNote({type: 'OPEN_FORM'});
   }
 
   function setTiTle(value: string) {
@@ -324,49 +333,49 @@ export default function Note() {
 
   return (
     <div className={container}>
+      {stateNote.isOpen && (
+        <ModalWrapper
+          onClose={onClose}>
+          <h2 className='text-[32px] text-[#1976d3] font-[Roboto, sans-serif] font-medium'>Create note</h2>
+          <Form
+            title={stateNote.title}
+            text={stateNote.text}
+            setTitle={setTiTle}
+            setText={setText}
+            onSubmit={handleSubmit}
+            auto={auto}
+          />
+          <div className='flex justify-center gap-[10px]'>
+            <button 
+              className={btnCreate} 
+              type="submit" 
+              form="note-form"
+            >
+              Save
+            </button>
+            <button className={btnClear} onClick={handleClearForm}>
+              Clear
+            </button>
+            
+          </div>
+        </ModalWrapper>
+      )}
       <div className={noteHeader}>
-        {stateNote.isOpen ? (
-          <div className={headerNote}>
-            <div className={headerNoteBtn}>
-              <button className={btnCreate} type="submit" form="note-form">
-                Save
-              </button>
-              <button className={btnClear} onClick={handleClearForm}>
-                Clear
-              </button>
-            </div>
-            <div className={formContainer}>
-              <Form
-                title={stateNote.title}
-                text={stateNote.text}
-                setTitle={setTiTle}
-                setText={setText}
-                onSubmit={handleSubmit}
-                auto={auto}
-              />
-              <button
-                className={btnClose}
-                onClick={() => dispatchNote({ type: 'CLOSE_FORM' })}
-              >
-                Close
-              </button>
-            </div>
+        <div className={headerNote}>
+          <div className={headerNoteBtn}>
+            {/* <button className={btnCreate} type="submit" form="note-form">
+              Open
+            </button> */}
+            <button 
+              className={btnCreate} 
+              onClick={onOpen}>
+              Open
+            </button>
+            <button className={btnClear} onClick={handleCleanNotes}>
+              Clear
+            </button>
           </div>
-        ) : (
-          <div className={headerNote}>
-            <div className={headerNoteBtn}>
-              <button
-                className={btnCreate}
-                onClick={() => dispatchNote({ type: 'OPEN_FORM' })}
-              >
-                Create
-              </button>
-              <button className={btnClear} onClick={handleCleanNotes}>
-                Clear
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
       <div className={noteBody}>
         <div className={sidebarWrapper}>
