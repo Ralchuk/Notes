@@ -23,8 +23,8 @@ const noteBody = 'flex w-full flex-1 h-screen overflow-hidden';
 
 // header
 const headerNoteBtn = 'flex flex-row gap-[10px] w-full justify-center';
-const btnThemeWrapper = 'flex gap-[20px] cursor-pointer';
-const btnTheme = 'flex border-blue-500 border-[1px] px-[10px] py-[5px] cursor-pointer';
+// const btnThemeWrapper = 'flex gap-[20px] cursor-pointer';
+// const btnTheme = 'flex border-blue-500 border-[1px] px-[10px] py-[5px] cursor-pointer';
 const btnCreate =
 	'flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer dark:hover:bg-[#07151e]';
 const btnClear =
@@ -354,14 +354,9 @@ export default function Note() {
 	
 	if(contextState === null || contextDispatch === null) return;
 
-	function handleThemeDark(){
-		if (!setTheme) return;
-		setTheme('dark');
-	};
-
-	function handleThemeLight(){
-		if (!setTheme) return;
-		setTheme('light');
+	function handleChange(){
+		if(setTheme ===null )return;
+		setTheme(theme === 'light' ? 'dark' : 'light');
 	}
 
 	return (
@@ -400,6 +395,7 @@ export default function Note() {
 				)}
 				<div className={noteHeader}>
 					<div className={headerNoteBtn}>
+						
 						<button
 							className={btnCreate}
 							onClick={onOpen}
@@ -413,15 +409,25 @@ export default function Note() {
 							Clear
 						</button>
 					</div>
-					<div className={btnThemeWrapper}>
-						<button 
-							className={btnTheme}
-							onClick={handleThemeDark}
-						>Dark</button>
-						<button 
-							className={btnTheme}
-							onClick={handleThemeLight}
-						>Light</button>
+					<div className='flex pr-[10px]'>
+						<label className='relative inline-flex cursor-pointer items-center'>
+							<input 
+								type="checkbox"
+								checked={theme === 'dark'}
+								onChange={handleChange}
+								className='sr-only peer' />
+							<div className="h-[40px] w-[80px] rounded-full border-[1px] border-[#1976d3] bg-white after:absolute after:start-[5px] after:top-0.5 after:h-[35px] after:w-[35px] after:bg-[#1976d3] after:rounded-full after:border after:border-[#1976d3]  after:transition-all after:content-[''] peer-checked:bg-[#1976d3] peer-checked:after:translate-x-full peer-checked:after:border-white peer-checked:after:bg-white rtl:peer-checked:after:-translate-x-full">
+							</div>
+							{theme === 'light'? 
+								<span className="ms-3 text-sm font-medium text-[#1976d3] whitespace-nowrap">
+									Light
+								</span> : 
+								<span className="ms-3 text-sm font-medium text-gray-300 whitespace-nowrap">
+									Dark
+								</span> 
+							}
+							
+						</label>
 					</div>
 				</div>
 				<div className={noteBody}>
