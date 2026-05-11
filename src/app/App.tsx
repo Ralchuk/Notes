@@ -1,10 +1,13 @@
 import Note from '@/entities/note/note';
+import ThemeComponent from '@/entities/note/theme';
 
 function App() {
-	
 	return (
 		<>
-			<Note/>
+			<ThemeComponent>
+				<Note/>
+			</ThemeComponent>
+			
 		</>
 	);
 }

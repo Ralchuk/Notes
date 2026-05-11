@@ -2,6 +2,7 @@ import Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
 import Sidebar from './sidebar';
 import ModalWrapper from './modalForm';
+import { NoteContextDispatch, NoteContextState } from './theme';
 
 import {
 	type Note,
@@ -11,27 +12,29 @@ import {
 	type NoteState,
 	type NoteAction,
 } from './model/types';
-import { useEffect, useRef, useReducer } from 'react';
+import { useEffect, useRef, useReducer, useContext } from 'react';
 
 // main classes
 const container =
-	'flex flex-col items-center content-center w-full  items-center h-screen';
+	'flex flex-col items-center content-center w-full  items-center h-screen bg-white dark:bg-[#07151e]';
 const noteHeader =
-	'flex flex-col w-full items-center pt-[30px] pb-[30px] gap-[15px] border-b border-[#1976d3]';
+	'flex flex-r justify-stretch w-full items-center pt-[30px] pb-[30px] gap-[15px] border-b border-[#1976d3]';
 const noteBody = 'flex w-full flex-1 h-screen overflow-hidden';
 
 // header
-const headerNote = 'flex flex-col items-center  gap-[15px] w-[350px]';
-const headerNoteBtn = 'flex flex-row gap-[10px]';
+const headerNoteBtn = 'flex flex-row gap-[10px] w-full justify-center';
+const btnThemeWrapper = 'flex gap-[20px] cursor-pointer';
+const btnTheme = 'flex border-blue-500 border-[1px] px-[10px] py-[5px] cursor-pointer';
 const btnCreate =
-	'flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer';
+	'flex uppercase px-6 py-2 text-white bg-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:bg-white hover: border-[#1976d3] hover: border-[1px] hover:text-[#1976d3] cursor-pointer dark:hover:bg-[#07151e]';
 const btnClear =
-	'flex uppercase px-6 py-2 text-[#1976d3] bg-white border-[1px] border-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:border-[#1976d3]/50 hover:text-[#1976d3]/50 cursor-pointer';
+	'flex uppercase px-6 py-2 text-[#1976d3] bg-white border-[1px] border-[#1976d3] rounded-[5px] font-[Roboto, sans-serif] font-medium transition-all duration-200 hover:border-[#1976d3]/50 hover:text-[#1976d3]/50 cursor-pointer dark:bg-[#07151e]';
 
 // sidebar
 const sidebarWrapper =
 	'flex flex-col flex-1 gap-[50px] px-[20px] pt-[20px] w-full max-w-[600px]  border-r-[1px] border-[#1976d3]/50 mb-[30px] overflow-auto';
-const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full';
+const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full dark:text-white';
+const arrEmptySvg ='stroke-black dark:stroke-white';
 
 // reducer для заметок
 
@@ -198,6 +201,8 @@ export default function Note() {
 
 	const [state, dispatch] = useReducer(reducer, initialState);
 
+	
+
 	function onCreate() {
 		dispatchNote({
 			type: 'SAVE_NOTE',
@@ -310,6 +315,8 @@ export default function Note() {
 		dispatch({ type: 'CLOSE_MENU' });
 	}
 
+	
+
 	// Закриття контекстного меню
 	const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -329,6 +336,33 @@ export default function Note() {
 			document.removeEventListener('click', onCloseMenu);
 		};
 	}, [state.isOpenMenu]);
+
+
+	const contextState = useContext(NoteContextState);
+	const contextDispatch = useContext(NoteContextDispatch);
+	const theme = contextState;
+	const setTheme = contextDispatch;
+
+	useEffect(() => {
+		console.log('theme:', theme);
+		if(theme === 'dark'){
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+	},[theme]);
+	
+	if(contextState === null || contextDispatch === null) return;
+
+	function handleThemeDark(){
+		if (!setTheme) return;
+		setTheme('dark');
+	};
+
+	function handleThemeLight(){
+		if (!setTheme) return;
+		setTheme('light');
+	}
 
 	return (
 		<>
@@ -365,21 +399,29 @@ export default function Note() {
 					</ModalWrapper>
 				)}
 				<div className={noteHeader}>
-					<div className={headerNote}>
-						<div className={headerNoteBtn}>
-							<button
-								className={btnCreate}
-								onClick={onOpen}
-							>
-								Open
-							</button>
-							<button
-								className={btnClear}
-								onClick={handleCleanNotes}
-							>
-								Clear
-							</button>
-						</div>
+					<div className={headerNoteBtn}>
+						<button
+							className={btnCreate}
+							onClick={onOpen}
+						>
+							Open
+						</button>
+						<button
+							className={btnClear}
+							onClick={handleCleanNotes}
+						>
+							Clear
+						</button>
+					</div>
+					<div className={btnThemeWrapper}>
+						<button 
+							className={btnTheme}
+							onClick={handleThemeDark}
+						>Dark</button>
+						<button 
+							className={btnTheme}
+							onClick={handleThemeLight}
+						>Light</button>
 					</div>
 				</div>
 				<div className={noteBody}>
@@ -403,15 +445,14 @@ export default function Note() {
 									height='60'
 									viewBox='0 0 24 24'
 									fill='none'
+									className={arrEmptySvg}
 								>
 									<path
 										d='M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z'
-										stroke='black'
 										strokeWidth='1.5'
 									/>
 									<path
 										d='M9 12h6M9 16h4'
-										stroke='black'
 										strokeWidth='1.5'
 									/>
 								</svg>
