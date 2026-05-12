@@ -1,5 +1,4 @@
 import { useContext, createContext, useId, useReducer } from 'react';
-import Empty_note from '../../../img/undraw_add-notes_9xls.svg';
 import {
 	type SiderbarState,
 	type SidebarAction,
@@ -200,71 +199,65 @@ const SidebarList = () => {
 	const { notes, onContextMenu, stateSidebar } = context;
 	return (
 		<div className={sidebar}>
-			{notes.length !== 0 ? (
-				<div className={StatusWrapper}>
-					{stateSidebar.filterStatusInprogress ?  (
-						<div className={StatusWrapperItem}>
-							<h2 className={StatusWrapperTitle}>In Progress</h2>
-							{notes
-								.filter(
-									(n) =>
-										n.status === 'inprogress' &&
-										n.title.includes(stateSidebar.showTitle) &&
-										n.content.includes(stateSidebar.showContent),
-								)
-								.map((item) => (
-									<div
-										className={itemNote}
-										key={item.id}
-										onContextMenu={(e) => onContextMenu(e, item)}
-									>
-										<div className={itemNoteHeader}>
-											<h1 className={itemNoteTitle}>{item.title}</h1>
-											<h2 className={itemNoteContent}>{item.content}</h2>
-										</div>
-										<h3 className={itemNoteDate}>
-											{item.createdAt.toLocaleString()}
-										</h3>
+			<div className={StatusWrapper}>
+				{stateSidebar.filterStatusInprogress ?  (
+					<div className={StatusWrapperItem}>
+						<h2 className={StatusWrapperTitle}>In Progress</h2>
+						{notes
+							.filter(
+								(n) =>
+									n.status === 'inprogress' &&
+									n.title.includes(stateSidebar.showTitle) &&
+									n.content.includes(stateSidebar.showContent),
+							)
+							.map((item) => (
+								<div
+									className={itemNote}
+									key={item.id}
+									onContextMenu={(e) => onContextMenu(e, item)}
+								>
+									<div className={itemNoteHeader}>
+										<h1 className={itemNoteTitle}>{item.title}</h1>
+										<h2 className={itemNoteContent}>{item.content}</h2>
 									</div>
-								))}
-						</div>
-					) : null
-					}
-					{stateSidebar.filterStatusCompleted ? (
-						<div className={StatusWrapperItem}>
-							<h2 className={StatusWrapperTitle}>Completed</h2>
-							{notes
-								.filter(
-									(n) =>
-										n.status === 'completed' &&
-										n.title.includes(stateSidebar.showTitle) &&
-										n.content.includes(stateSidebar.showContent),
-								)
-								.map((item) => (
-									<div
-										className={itemNoteCompleted}
-										key={item.id}
-										onContextMenu={(e) => onContextMenu(e, item)}
-									>
-										<div className={itemNoteHeaderCompleted}>
-											<h1 className={itemNoteTitleCompleted}>{item.title}</h1>
-											<h2 className={itemNoteContentCompleted}>
-												{item.content}
-											</h2>
-										</div>
-										<h3 className={itemNoteDateCompleted}>
-											{item.createdAt.toLocaleString()}
-										</h3>
+									<h3 className={itemNoteDate}>
+										{item.createdAt.toLocaleString()}
+									</h3>
+								</div>
+							))}
+					</div>
+				) : null
+				}
+				{stateSidebar.filterStatusCompleted ? (
+					<div className={StatusWrapperItem}>
+						<h2 className={StatusWrapperTitle}>Completed</h2>
+						{notes
+							.filter(
+								(n) =>
+									n.status === 'completed' &&
+									n.title.includes(stateSidebar.showTitle) &&
+									n.content.includes(stateSidebar.showContent),
+							)
+							.map((item) => (
+								<div
+									className={itemNoteCompleted}
+									key={item.id}
+									onContextMenu={(e) => onContextMenu(e, item)}
+								>
+									<div className={itemNoteHeaderCompleted}>
+										<h1 className={itemNoteTitleCompleted}>{item.title}</h1>
+										<h2 className={itemNoteContentCompleted}>
+											{item.content}
+										</h2>
 									</div>
-								))}
-						</div>
-					) : null}
-				</div>
-			) : (
-				<div>
-					<img  src={Empty_note} alt='no_notes' />
-				</div>
-			)}
+									<h3 className={itemNoteDateCompleted}>
+										{item.createdAt.toLocaleString()}
+									</h3>
+								</div>
+							))}
+					</div>
+				) : null}
+			</div>
 		</div>
 	);
 };
