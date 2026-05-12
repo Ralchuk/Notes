@@ -1,4 +1,5 @@
 import { useContext, createContext, useId, useReducer } from 'react';
+import Empty_note from '../../../img/undraw_add-notes_9xls.svg';
 import {
 	type SiderbarState,
 	type SidebarAction,
@@ -50,12 +51,13 @@ const itemNoteContentCompleted =
 const itemNoteDateCompleted =
 	'text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
 
-const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full';
+// const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full';
 
 const InitialSidebarState: SiderbarState = {
 	showTitle: '',
 	showContent: '',
-	filterStatus: 'inprogress',
+	filterStatusInprogress: true,
+	filterStatusCompleted: false,
 };
 
 function reduceSidebar(state: SiderbarState, action: SidebarAction) {
@@ -70,10 +72,15 @@ function reduceSidebar(state: SiderbarState, action: SidebarAction) {
 			...state,
 			showContent: action.payload,
 		};
-	case 'TOGGLE_STATUS':
+	case 'STATUS_INPROGRESS':
 		return {
 			...state,
-			filterStatus: action.payload,
+			filterStatusInprogress: !state.filterStatusInprogress
+		};
+	case 'STATUS_COMPLETED':
+		return {
+			...state,
+			filterStatusCompleted: !state.filterStatusCompleted,
 		};
 	}
 }
@@ -151,14 +158,15 @@ const SidebarFilterGroup = () => {
 			>
 				<div className={checkboxItem}>
 					<input
-						type="radio"
-						name="status"
+						type="checkbox"
+						name="statusInprogres"
 						className={checkboxInput}
 						id={`${id}-inprogress`}
+						
 						autoComplete="off"
 						defaultChecked
 						onChange={() =>
-							dispatchSidebar({ type: 'TOGGLE_STATUS', payload: 'inprogress' })
+							dispatchSidebar({ type: 'STATUS_INPROGRESS'})
 						}
 					/>
 					<label className={checkboxBtnProgress} htmlFor={`${id}-inprogress`}>
@@ -167,13 +175,14 @@ const SidebarFilterGroup = () => {
 				</div>
 				<div className={checkboxItem}>
 					<input
-						type="radio"
-						name="status"
+						type="checkbox"
+						name="statusCompl"
 						className={checkboxInput}
+						
 						id={`${id}-completed`}
 						autoComplete="off"
 						onChange={() =>
-							dispatchSidebar({ type: 'TOGGLE_STATUS', payload: 'completed' })
+							dispatchSidebar({ type: 'STATUS_COMPLETED'})
 						}
 					/>
 					<label className={checkboxBtnCompleted} htmlFor={`${id}-completed`}>
@@ -193,7 +202,7 @@ const SidebarList = () => {
 		<div className={sidebar}>
 			{notes.length !== 0 ? (
 				<div className={StatusWrapper}>
-					{stateSidebar.filterStatus === 'inprogress' && (
+					{stateSidebar.filterStatusInprogress ?  (
 						<div className={StatusWrapperItem}>
 							<h2 className={StatusWrapperTitle}>In Progress</h2>
 							{notes
@@ -219,8 +228,9 @@ const SidebarList = () => {
 									</div>
 								))}
 						</div>
-					)}
-					{stateSidebar.filterStatus === 'completed' && (
+					) : null
+					}
+					{stateSidebar.filterStatusCompleted ? (
 						<div className={StatusWrapperItem}>
 							<h2 className={StatusWrapperTitle}>Completed</h2>
 							{notes
@@ -248,20 +258,11 @@ const SidebarList = () => {
 									</div>
 								))}
 						</div>
-					)}
+					) : null}
 				</div>
 			) : (
-				<div className={arrEmpty}>
-					<svg width="60" height="60" viewBox="0 0 24 24" fill="none">
-						<path
-							d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"
-							stroke="black"
-							strokeWidth="1.5"
-						/>
-						<path d="M9 12h6M9 16h4" stroke="black" strokeWidth="1.5" />
-					</svg>
-					<p>No notes yet</p>
-					<small>Click "Create" to add your first note</small>
+				<div>
+					<img  src={Empty_note} alt='no_notes' />
 				</div>
 			)}
 		</div>
