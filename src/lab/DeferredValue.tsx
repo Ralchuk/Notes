@@ -1,6 +1,4 @@
 import { useState, useDeferredValue, useMemo, memo } from 'react';
-
-
 const HeavyList = memo(({text}:{text: string}) => {
 	const items = useMemo(() => {
 		return Array.from({length: 50000}).map((_, i) => (
