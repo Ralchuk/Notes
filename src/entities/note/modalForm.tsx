@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react';
 
 const portalBg = 'flex fixed inset-0 bg-black/50 justify-center items-center';
 const portalWrapper =
-	'flex flex-col gap-[40px] bg-white px-[40px] py-[40px]  uppercase rounded-[15px] overflow-hidden ';
+	'flex flex-col gap-[40px] bg-white px-[40px] py-[40px]  uppercase rounded-[15px] overflow-hidden bg-white dark:bg-[#07151e] dark:border-[1px] dark:border-[#1976d3]';
 
 type ModalProp = {
 	children: React.ReactNode;
@@ -16,7 +16,7 @@ const ModalWrapper = ({ children, onClose }: ModalProp) => {
 
 	useEffect(() => {
 		const focusableElements = modalRef.current?.querySelectorAll(
-			'button, input, a, textarea, select, input, [tabindex]:not([tabindex="-1"], [href]'
+			'button, input, a, textarea, select, input, [tabindex]:not([tabindex="-1"]), [href]'
 		);
 
 		if (!focusableElements || focusableElements.length === 0) return;
@@ -27,7 +27,9 @@ const ModalWrapper = ({ children, onClose }: ModalProp) => {
 			focusableElements.length - 1
 		] as HTMLElement;
 
-		firstElement.focus();
+		if (!modalRef.current?.contains(document.activeElement)){
+			firstElement.focus();
+		};
 
 		function handleTab(e: KeyboardEvent) {
 			if (e.key !== 'Tab') return;

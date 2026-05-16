@@ -7,40 +7,40 @@ import { type AutoResizeTextareaHandle } from './model/types';
 const formText = 'w-full px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none resize-none overflow-hidden focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:text-gray-400 focus:placeholder-transparent';
 
 const AutoResizingTextArea = forwardRef<AutoResizeTextareaHandle, PropResizingTextarea>(({text, setText}, ref) => {
-    const refTextarea= useRef<HTMLTextAreaElement | null>(null)
+	const refTextarea= useRef<HTMLTextAreaElement | null>(null);
 
-    useImperativeHandle(ref, () => ({
-       resetAndFocus:
-       () => {
-            setText('');
-            refTextarea.current?.focus()
-       }
-    }))
-    
+	useImperativeHandle(ref, () => ({
+		resetAndFocus:
+		() => {
+			refTextarea.current?.focus();
+			setText('');
+		}
+	}));
+	
 
-    function handleResize(){
-        const el = refTextarea.current;
-        if(!el) return;
+	function handleResize(){
+		const el = refTextarea.current;
+		if(!el) return;
 
-        el.style.height = 'auto';
-        el.style.height = el.scrollHeight + 'px';
-    }
-    return (
-        <div>
-            <textarea 
-                ref ={refTextarea}
-                rows={4}
-                className={formText}
-                placeholder='Write your note here...'
-                value={text}
-                onChange={(e) => {
-                    setText(e.target.value);
-                    handleResize()
-                }}
-            >
-            </textarea>
-        </div>
-    )
-})
+		el.style.height = 'auto';
+		el.style.height = el.scrollHeight + 'px';
+	}
+	return (
+		<div>
+			<textarea 
+				ref ={refTextarea}
+				rows={4}
+				className={formText}
+				placeholder='Write your note here...'
+				value={text}
+				onChange={(e) => {
+					setText(e.target.value);
+					handleResize();
+				}}
+			>
+			</textarea>
+		</div>
+	);
+});
 
 export default AutoResizingTextArea; 
