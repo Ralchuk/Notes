@@ -116,6 +116,8 @@ export type AutoResizeTextareaHandle = {
 export type SiderbarState = {
   showTitle: string;
   showContent: string;
+  deferredShowTitle: string;
+  deferredShowContent: string;
   filterStatusInprogress: boolean;
   filterStatusCompleted: boolean;
 };
@@ -127,6 +129,14 @@ export type SidebarAction =
     }
   | {
       type: 'SEARCHING_BY_CONTENT';
+      payload: string;
+    }
+  | {
+      type: 'DEFERRED_SEARCHING_BY_TITLE';
+      payload: string;
+    }
+  | {
+      type: 'DEFERRED_SEARCHING_BY_CONTENT';
       payload: string;
     }
   | {
@@ -147,4 +157,6 @@ export type SidebarContextType = SidebarProp & {
   stateSidebar: SiderbarState;
   dispatchSidebar: React.Dispatch<SidebarAction>;
   id: string;
+  isPanding: boolean;
+  startTransition: (callback: () => void) => void;
 };

@@ -1,4 +1,4 @@
-import { useContext, createContext, useId, useReducer } from 'react';
+import { useContext, createContext, useId, useReducer, useTransition } from 'react';
 import {
 	type SiderbarState,
 	type SidebarAction,
@@ -24,7 +24,7 @@ const checkboxBtnCompleted =
 const inputTitle =
 	'w-[300px] px-3 py-1 rounded-[5px] border-[1px] border-[#1976d3]/40 outline-none focus:border-[#1976d3] font-[Roboto, sans-serif] placeholder:text-gray-400 focus:placeholder-transparent';
 
-const StatusWrapper = 'flex flex-col gap-[20px]';
+const StatusWrapper = 'flex flex-col gap-[20px] relative';
 const StatusWrapperItem = 'flex flex-col  py-[10px] gap-[10px]';
 const StatusWrapperTitle =
 	'text-black/50 text-[24px] font-[Roboto, sans-serif] font-normal px-[10px] border-b-[1px] dark:text-white';
@@ -50,11 +50,20 @@ const itemNoteContentCompleted =
 const itemNoteDateCompleted =
 	'text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
 
+// isPanding
+
+const isPandingbg = 'flex w-full h-full absolute bg-white/75 justify-center items-center';
+const isPandingWrapper = 'flex flex-col gap-[10px]';
+const isPandingLoader = 'flex w-[70px] h-[70px] bg-transparent border-[5px] border-solid border-t-[#1976d3] border-r-transparent border-b-[#1976d3] border-l-transparent rounded-full animate-spin';
+const isPandingText = 'text-[#1976d3] text-[16px] font-[Roboto, sans-serif] font-normal';
+
 // const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full';
 
 const InitialSidebarState: SiderbarState = {
 	showTitle: '',
 	showContent: '',
+	deferredShowTitle: '',
+	deferredShowContent: '',
 	filterStatusInprogress: true,
 	filterStatusCompleted: false,
 };
@@ -70,6 +79,16 @@ function reduceSidebar(state: SiderbarState, action: SidebarAction) {
 		return {
 			...state,
 			showContent: action.payload,
+		};
+	case 'DEFERRED_SEARCHING_BY_TITLE':
+		return {
+			...state,
+			deferredShowTitle: action.payload,
+		};
+	case 'DEFERRED_SEARCHING_BY_CONTENT':
+		return {
+			...state,
+			deferredShowContent: action.payload,
 		};
 	case 'STATUS_INPROGRESS':
 		return {
@@ -97,6 +116,7 @@ const SidebarComponent = ({
 		reduceSidebar,
 		InitialSidebarState,
 	);
+	const [isPanding, startTransition] = useTransition();
 
 	const id = useId();
 	return (
@@ -106,6 +126,8 @@ const SidebarComponent = ({
 				stateSidebar,
 				dispatchSidebar,
 				id,
+				isPanding,
+				startTransition,
 			}}
 		>
 			{children}
@@ -116,7 +138,23 @@ const SidebarComponent = ({
 const SidebarFilterGroup = () => {
 	const context = useContext(SidebarContext);
 	if (context === null) return;
-	const { stateSidebar, dispatchSidebar, id } = context;
+	const { stateSidebar, dispatchSidebar, id, startTransition } = context;
+
+	function handleSearchingTitle(e: React.ChangeEvent<HTMLInputElement>){
+		const newValue = e.target.value;
+		dispatchSidebar({type:'SEARCHING_BY_TITLE', payload: newValue});
+		startTransition(() => {
+			dispatchSidebar({type:'DEFERRED_SEARCHING_BY_TITLE', payload: newValue});
+		});
+	};
+	function handleSearchingContent(e: React.ChangeEvent<HTMLInputElement>){
+		const newValue = e.target.value;
+		dispatchSidebar({type:'SEARCHING_BY_CONTENT', payload: newValue});
+		startTransition(() => {
+			dispatchSidebar({type:'DEFERRED_SEARCHING_BY_CONTENT', payload: newValue});
+		});
+	};
+
 	return (
 		<div className={filter}>
 			<h2 className={filterTitle}>Filter</h2>
@@ -128,12 +166,7 @@ const SidebarFilterGroup = () => {
 					type="text"
 					id={`${id}-title`}
 					value={stateSidebar.showTitle}
-					onChange={(e) =>
-						dispatchSidebar({
-							type: 'SEARCHING_BY_TITLE',
-							payload: e.target.value,
-						})
-					}
+					onChange={handleSearchingTitle}
 				/>
 				<label htmlFor={`${id}-content`} />
 				<input
@@ -142,12 +175,7 @@ const SidebarFilterGroup = () => {
 					type="text"
 					id={`${id}-content`}
 					value={stateSidebar.showContent}
-					onChange={(e) =>
-						dispatchSidebar({
-							type: 'SEARCHING_BY_CONTENT',
-							payload: e.target.value,
-						})
-					}
+					onChange={handleSearchingContent}
 				/>
 			</div>
 			<div
@@ -196,19 +224,34 @@ const SidebarFilterGroup = () => {
 const SidebarList = () => {
 	const context = useContext(SidebarContext);
 	if (context == null) return;
-	const { notes, onContextMenu, stateSidebar } = context;
+	const { notes, onContextMenu, stateSidebar, isPanding } = context;
 	return (
 		<div className={sidebar}>
 			<div className={StatusWrapper}>
-				{stateSidebar.filterStatusInprogress ?  (
+				{isPanding && 
+					<div
+				 	className={isPandingbg}>
+						<div
+							className={isPandingWrapper}>
+							<div
+								className={isPandingLoader}>
+							</div>
+							<p
+								className={isPandingText}>Searching...
+							</p>
+						</div>
+					</div>
+				}
+				
+				{stateSidebar.filterStatusInprogress  ?  (
 					<div className={StatusWrapperItem}>
 						<h2 className={StatusWrapperTitle}>In Progress</h2>
 						{notes
 							.filter(
 								(n) =>
 									n.status === 'inprogress' &&
-									n.title.includes(stateSidebar.showTitle) &&
-									n.content.includes(stateSidebar.showContent),
+									n.title.toLocaleLowerCase().startsWith(stateSidebar.deferredShowTitle.toLocaleLowerCase()) &&
+									n.content.toLocaleLowerCase().startsWith(stateSidebar.deferredShowContent.toLocaleLowerCase()),
 							)
 							.map((item) => (
 								<div
@@ -235,8 +278,8 @@ const SidebarList = () => {
 							.filter(
 								(n) =>
 									n.status === 'completed' &&
-									n.title.includes(stateSidebar.showTitle) &&
-									n.content.includes(stateSidebar.showContent),
+									n.title.toLocaleLowerCase().startsWith(stateSidebar.deferredShowTitle.toLocaleLowerCase()) &&
+									n.content.toLocaleLowerCase().startsWith(stateSidebar.deferredShowContent.toLocaleLowerCase()),
 							)
 							.map((item) => (
 								<div
