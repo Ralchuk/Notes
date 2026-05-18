@@ -13,7 +13,7 @@ import {
 	type NoteState,
 	type NoteAction,
 } from './model/types';
-import { useEffect, useRef, useReducer, useContext } from 'react';
+import { useEffect, useRef, useReducer, useContext, useCallback } from 'react';
 
 // main classes
 const container =
@@ -268,8 +268,7 @@ export default function Note() {
 	}
 
 	// Контекстне меню
-	function onContextMenu(e: React.MouseEvent<HTMLDivElement>, item: Note) {
-		e.preventDefault();
+	const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>, item: Note) => {e.preventDefault();
 		dispatch({
 			type: 'OPEN_MENU',
 			payload: {
@@ -277,7 +276,8 @@ export default function Note() {
 				noteItem: item,
 			},
 		});
-	}
+	},[dispatch])
+	
 
 	function onEditNote() {
 		dispatch({ type: 'HIDE_MENU' });
