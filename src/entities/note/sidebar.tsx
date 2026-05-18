@@ -58,6 +58,22 @@ const isPandingWrapper = 'flex flex-col gap-[10px]';
 const isPandingLoader = 'flex w-[70px] h-[70px] bg-transparent border-[5px] border-solid border-t-[#1976d3] border-r-transparent border-b-[#1976d3] border-l-transparent rounded-full animate-spin';
 const isPandingText = 'text-[#1976d3] text-[16px] font-[Roboto, sans-serif] font-normal';
 
+const markDownParser = (value: string):string =>{
+	return value
+		.replace(/^# (.+)/gm, '<h1>$1</h1>')
+		.replace(/^## (.+)/gm, '<h2>$1</h2>')
+		.replace(/^### (.+)/gm, '<h3>$1</h3>')
+		.replace(/^#### (.+)/gm, '<h4>$1</h4>')
+		.replace(/^##### (.+)/gm, '<h5>$1</h5>')
+		.replace(/^###### (.+)/gm, '<h6>$1</h6>')
+		.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+		.replace(/^__(.+?)__/g, '<b>$1</b>')
+		.replace(/\*(.+?)\*/g, '<em>$1</em>')
+		.replace(/^_(.+?)/gm, '<i>$1</i>')
+		.replace(/^`(.+?)/gm, '<code>$1</code>')
+		.replace(/^```(.+?)/gm, '<pre><code>$1</code><pre>');
+};
+
 // const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full';
 
 const InitialSidebarState: SiderbarState = {
@@ -223,25 +239,49 @@ const SidebarFilterGroup = () => {
 };
 
 const SidebarList = () => {
+	
 	const context = useContext(SidebarContext);
-	if (context == null) return;
-	const { notes, onContextMenu, stateSidebar, isPanding } = context;
 
-	const markDownParser =(value: string):string =>{
-		return value
-		.replace(/^# (.+)/gm, '<h1>$1</h1>')
-		.replace(/^## (.+)/gm, '<h2>$1</h2>')
-		.replace(/^### (.+)/gm, '<h3>$1</h3>')
-		.replace(/^#### (.+)/gm, '<h4>$1</h4>')
-		.replace(/^##### (.+)/gm, '<h5>$1</h5>')
-		.replace(/^###### (.+)/gm, '<h6>$1</h6>')
-		.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-		.replace(/^__(.+?)__/g, '<b>$1</b>')
-		.replace(/\*(.+?)\*/g, '<em>$1</em>')
-		.replace(/^_(.+?)/gm, '<i>$1</i>')
-		.replace(/^`(.+?)/gm, '<code>$1</code>')
-		.replace(/^```(.+?)/gm, '<pre><code>$1</code><pre>')
-	};
+	const filterInProgress = useMemo(() => {
+		if (context == null) return;
+		const { notes, stateSidebar } = context;
+		return notes
+			.filter(
+				(n) =>
+					n.status === 'inprogress' &&
+					n.title.toLocaleLowerCase().startsWith(stateSidebar.deferredShowTitle?.toLocaleLowerCase()) &&
+					n.content.toLocaleLowerCase().startsWith(stateSidebar.deferredShowContent?.toLocaleLowerCase()),
+			)
+			.map((item) => ({
+				...item,
+				parsedTitle: markDownParser(item.title),
+				parsedContent: markDownParser(item.content),
+			}));
+	},
+	[context]);
+
+	const filterCompleted = useMemo(() => {
+		if (context == null) return;
+		const { notes, stateSidebar } = context;
+		return notes
+			.filter(
+				(n) =>
+					n.status === 'completed' &&
+					n.title.toLocaleLowerCase().startsWith(stateSidebar.deferredShowTitle?.toLocaleLowerCase()) &&
+					n.content.toLocaleLowerCase().startsWith(stateSidebar.deferredShowContent?.toLocaleLowerCase()),
+			)
+			.map((item) => ({
+				...item,
+				parsedTitle: markDownParser(item.title),
+				parsedContent: markDownParser(item.content),
+			}));
+	},
+	[context]);
+
+	if (context == null) return;
+	const { onContextMenu, stateSidebar, isPanding } = context;
+
+	
 
 	return (
 		<div className={sidebar}>
@@ -264,60 +304,45 @@ const SidebarList = () => {
 				{stateSidebar.filterStatusInprogress  ?  (
 					<div className={StatusWrapperItem}>
 						<h2 className={StatusWrapperTitle}>In Progress</h2>
-						{notes
-							.filter(
-								(n) =>
-									n.status === 'inprogress' &&
-									n.title.toLocaleLowerCase().startsWith(stateSidebar.deferredShowTitle.toLocaleLowerCase()) &&
-									n.content.toLocaleLowerCase().startsWith(stateSidebar.deferredShowContent.toLocaleLowerCase()),
-							)
-							.map((item) => (
-								<div
-									className={itemNote}
-									key={item.id}
-									onContextMenu={(e) => onContextMenu(e, item)}
-								>
-									<div className={itemNoteHeader}>
-										<p className={itemNoteTitle} dangerouslySetInnerHTML={{ __html: markDownParser(item.title) }}/>
-										<h2 className={itemNoteContent} dangerouslySetInnerHTML={{ __html: markDownParser(item.content) }}/>
-									</div>
-									<h3 className={itemNoteDate}>
-										{item.createdAt.toLocaleString()}
-									</h3>
+						{filterInProgress?.map((item) => (
+							<div
+								className={itemNote}
+								key={item.id}
+								onContextMenu={(e) => onContextMenu(e, item)}
+							>
+								<div className={itemNoteHeader}>
+									<p className={itemNoteTitle} dangerouslySetInnerHTML={{ __html: item.parsedTitle }}/>
+									<p className={itemNoteContent} dangerouslySetInnerHTML={{ __html: item.parsedContent }}/>
 								</div>
-							))}
+								<h3 className={itemNoteDate}>
+									{item.createdAt.toLocaleString()}
+								</h3>
+							</div>
+						))}
 					</div>
 				) : null
 				}
-				{stateSidebar.filterStatusCompleted ? (
+				{stateSidebar.filterStatusCompleted  ?  (
 					<div className={StatusWrapperItem}>
 						<h2 className={StatusWrapperTitle}>Completed</h2>
-						{notes
-							.filter(
-								(n) =>
-									n.status === 'completed' &&
-									n.title.toLocaleLowerCase().startsWith(stateSidebar.deferredShowTitle.toLocaleLowerCase()) &&
-									n.content.toLocaleLowerCase().startsWith(stateSidebar.deferredShowContent.toLocaleLowerCase()),
-							)
-							.map((item) => (
-								<div
-									className={itemNoteCompleted}
-									key={item.id}
-									onContextMenu={(e) => onContextMenu(e, item)}
-								>
-									<div className={itemNoteHeaderCompleted}>
-										<h1 className={itemNoteTitleCompleted}>{markDownParser(item.title)}</h1>
-										<h2 className={itemNoteContentCompleted}>
-											{markDownParser(item.content)}
-										</h2>
-									</div>
-									<h3 className={itemNoteDateCompleted}>
-										{item.createdAt.toLocaleString()}
-									</h3>
+						{filterCompleted?.map((item) => (
+							<div
+								className={itemNote}
+								key={item.id}
+								onContextMenu={(e) => onContextMenu(e, item)}
+							>
+								<div className={itemNoteHeader}>
+									<p className={itemNoteTitle} dangerouslySetInnerHTML={{ __html: item.parsedTitle }}/>
+									<p className={itemNoteContent} dangerouslySetInnerHTML={{ __html: item.parsedContent }}/>
 								</div>
-							))}
+								<h3 className={itemNoteDate}>
+									{item.createdAt.toLocaleString()}
+								</h3>
+							</div>
+						))}
 					</div>
-				) : null}
+				) : null
+				}
 			</div>
 		</div>
 	);
