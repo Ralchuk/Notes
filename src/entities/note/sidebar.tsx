@@ -327,15 +327,15 @@ const SidebarList = () => {
 						<h2 className={StatusWrapperTitle}>Completed</h2>
 						{filterCompleted?.map((item) => (
 							<div
-								className={itemNote}
+								className={itemNoteCompleted}
 								key={item.id}
 								onContextMenu={(e) => onContextMenu(e, item)}
 							>
-								<div className={itemNoteHeader}>
-									<p className={itemNoteTitle} dangerouslySetInnerHTML={{ __html: item.parsedTitle }}/>
-									<p className={itemNoteContent} dangerouslySetInnerHTML={{ __html: item.parsedContent }}/>
+								<div className={itemNoteHeaderCompleted}>
+									<p className={itemNoteTitleCompleted} dangerouslySetInnerHTML={{ __html: item.parsedTitle }}/>
+									<p className={itemNoteContentCompleted} dangerouslySetInnerHTML={{ __html: item.parsedContent }}/>
 								</div>
-								<h3 className={itemNoteDate}>
+								<h3 className={itemNoteDateCompleted}>
 									{item.createdAt.toLocaleString()}
 								</h3>
 							</div>
