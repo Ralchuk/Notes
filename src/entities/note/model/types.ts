@@ -120,6 +120,7 @@ export type SiderbarState = {
   deferredShowContent: string;
   filterStatusInprogress: boolean;
   filterStatusCompleted: boolean;
+
 };
 
 export type SidebarAction =

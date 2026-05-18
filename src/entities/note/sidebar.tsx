@@ -1,10 +1,11 @@
-import { useContext, createContext, useId, useReducer, useTransition } from 'react';
+import { useContext, createContext, useId, useReducer, useTransition, useMemo } from 'react';
 import {
 	type SiderbarState,
 	type SidebarAction,
 	type SidebarProp,
 	type SidebarContextType,
 } from './model/types';
+// import { title } from 'process';
 
 const sidebar = 'flex flex-col flex-1 gap-[30px] w-full ';
 
@@ -225,6 +226,23 @@ const SidebarList = () => {
 	const context = useContext(SidebarContext);
 	if (context == null) return;
 	const { notes, onContextMenu, stateSidebar, isPanding } = context;
+
+	const markDownParser =(value: string):string =>{
+		return value
+		.replace(/^# (.+)/gm, '<h1>$1</h1>')
+		.replace(/^## (.+)/gm, '<h2>$1</h2>')
+		.replace(/^### (.+)/gm, '<h3>$1</h3>')
+		.replace(/^#### (.+)/gm, '<h4>$1</h4>')
+		.replace(/^##### (.+)/gm, '<h5>$1</h5>')
+		.replace(/^###### (.+)/gm, '<h6>$1</h6>')
+		.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+		.replace(/^__(.+?)__/g, '<b>$1</b>')
+		.replace(/\*(.+?)\*/g, '<em>$1</em>')
+		.replace(/^_(.+?)/gm, '<i>$1</i>')
+		.replace(/^`(.+?)/gm, '<code>$1</code>')
+		.replace(/^```(.+?)/gm, '<pre><code>$1</code><pre>')
+	};
+
 	return (
 		<div className={sidebar}>
 			<div className={StatusWrapper}>
@@ -260,8 +278,8 @@ const SidebarList = () => {
 									onContextMenu={(e) => onContextMenu(e, item)}
 								>
 									<div className={itemNoteHeader}>
-										<h1 className={itemNoteTitle}>{item.title}</h1>
-										<h2 className={itemNoteContent}>{item.content}</h2>
+										<p className={itemNoteTitle} dangerouslySetInnerHTML={{ __html: markDownParser(item.title) }}/>
+										<h2 className={itemNoteContent} dangerouslySetInnerHTML={{ __html: markDownParser(item.content) }}/>
 									</div>
 									<h3 className={itemNoteDate}>
 										{item.createdAt.toLocaleString()}
@@ -288,9 +306,9 @@ const SidebarList = () => {
 									onContextMenu={(e) => onContextMenu(e, item)}
 								>
 									<div className={itemNoteHeaderCompleted}>
-										<h1 className={itemNoteTitleCompleted}>{item.title}</h1>
+										<h1 className={itemNoteTitleCompleted}>{markDownParser(item.title)}</h1>
 										<h2 className={itemNoteContentCompleted}>
-											{item.content}
+											{markDownParser(item.content)}
 										</h2>
 									</div>
 									<h3 className={itemNoteDateCompleted}>

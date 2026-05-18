@@ -221,7 +221,7 @@ export default function Note() {
 		dispatchNote({ type: 'OPEN_FORM' });
 	}
 
-	function setTiTle(value: string) {
+	function setTitle(value: string) {
 		dispatchNote({
 			type: 'SET_TITLE',
 			payload: value,
@@ -318,7 +318,6 @@ export default function Note() {
 		dispatch({ type: 'CLOSE_MENU' });
 	}
 
-	
 
 	// Закриття контекстного меню
 	const menuRef = useRef<HTMLDivElement | null>(null);
@@ -373,7 +372,7 @@ export default function Note() {
 						<Form
 							title={stateNote.title}
 							text={stateNote.text}
-							setTitle={setTiTle}
+							setTitle={setTitle}
 							setText={setText}
 							onSubmit={handleSubmit}
 							auto={auto}
