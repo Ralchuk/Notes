@@ -1,13 +1,15 @@
-import Note from '@/entities/note/note';
-import ThemeComponent from '@/entities/note/theme';
+// import Note from '@/entities/note/note';
+// import ThemeComponent from '@/entities/note/theme';
+import Chart1 from '@/lab/Lazy';
 
 
 function App() {
 	return (
 		<>
-			<ThemeComponent>
+			{/* <ThemeComponent>
 				<Note/>
-			</ThemeComponent>
+			</ThemeComponent> */}
+			<Chart1/>
 		</>
 	);
 }
