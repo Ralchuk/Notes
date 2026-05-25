@@ -242,15 +242,18 @@ const SidebarList = () => {
 	
 	const context = useContext(SidebarContext);
 
+	const notes = context?.notes;
+	const deferredShowTitle = context?.stateSidebar.deferredShowTitle ?? '';
+	const deferredShowContent = context?.stateSidebar.deferredShowContent ?? '';
+
 	const filterInProgress = useMemo(() => {
-		if (context == null) return;
-		const { notes, stateSidebar } = context;
+		if (!notes) return;
 		return notes
 			.filter(
 				(n) =>
 					n.status === 'inprogress' &&
-					n.title.toLocaleLowerCase().startsWith(stateSidebar.deferredShowTitle?.toLocaleLowerCase()) &&
-					n.content.toLocaleLowerCase().startsWith(stateSidebar.deferredShowContent?.toLocaleLowerCase()),
+					n.title.toLocaleLowerCase().startsWith(deferredShowTitle.toLocaleLowerCase()) &&
+					n.content.toLocaleLowerCase().startsWith(deferredShowContent.toLocaleLowerCase()),
 			)
 			.map((item) => ({
 				...item,
@@ -258,17 +261,32 @@ const SidebarList = () => {
 				parsedContent: markDownParser(item.content),
 			}));
 	},
-	[context]);
+	[notes, deferredShowTitle, deferredShowContent]);
+
+	// function filterInProgress(){
+	// 	if (!notes) return;
+	// 	return notes
+	// 		.filter(
+	// 			(n) =>
+	// 				n.status === 'inprogress' &&
+	// 				n.title.toLocaleLowerCase().startsWith(deferredShowTitle.toLocaleLowerCase()) &&
+	// 				n.content.toLocaleLowerCase().startsWith(deferredShowContent.toLocaleLowerCase()),
+	// 		)
+	// 		.map((item) => ({
+	// 			...item,
+	// 			parsedTitle: markDownParser(item.title),
+	// 			parsedContent: markDownParser(item.content),
+	// 		}));
+	// };
 
 	const filterCompleted = useMemo(() => {
-		if (context == null) return;
-		const { notes, stateSidebar } = context;
+		if (!notes) return;
 		return notes
 			.filter(
 				(n) =>
 					n.status === 'completed' &&
-					n.title.toLocaleLowerCase().startsWith(stateSidebar.deferredShowTitle?.toLocaleLowerCase()) &&
-					n.content.toLocaleLowerCase().startsWith(stateSidebar.deferredShowContent?.toLocaleLowerCase()),
+					n.title.toLocaleLowerCase().startsWith(deferredShowTitle.toLocaleLowerCase()) &&
+					n.content.toLocaleLowerCase().startsWith(deferredShowContent.toLocaleLowerCase()),
 			)
 			.map((item) => ({
 				...item,
@@ -276,7 +294,23 @@ const SidebarList = () => {
 				parsedContent: markDownParser(item.content),
 			}));
 	},
-	[context]);
+	[notes, deferredShowTitle, deferredShowContent]);
+
+	// function filterCompleted(){
+	// 	if (!notes) return;
+	// 	return notes
+	// 		.filter(
+	// 			(n) =>
+	// 				n.status === 'completed' &&
+	// 				n.title.toLocaleLowerCase().startsWith(deferredShowTitle.toLocaleLowerCase()) &&
+	// 				n.content.toLocaleLowerCase().startsWith(deferredShowContent.toLocaleLowerCase()),
+	// 		)
+	// 		.map((item) => ({
+	// 			...item,
+	// 			parsedTitle: markDownParser(item.title),
+	// 			parsedContent: markDownParser(item.content),
+	// 		}));
+	// };
 
 	if (context == null) return;
 	const { onContextMenu, stateSidebar, isPanding } = context;

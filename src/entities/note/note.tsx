@@ -268,6 +268,18 @@ export default function Note() {
 	}
 
 	// Контекстне меню
+
+	// function onContextMenu(e: React.MouseEvent<HTMLDivElement>, item: Note){e.preventDefault();
+	// 	dispatch({
+	// 		type: 'OPEN_MENU',
+	// 		payload: {
+	// 			coord: { x: e.clientX, y: e.clientY },
+	// 			noteItem: item,
+	// 		},
+	// 	});
+	// };
+
+
 	const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>, item: Note) => {e.preventDefault();
 		dispatch({
 			type: 'OPEN_MENU',
@@ -276,10 +288,25 @@ export default function Note() {
 				noteItem: item,
 			},
 		});
-	},[dispatch])
-	
+	},[dispatch]);
 
-	function onEditNote() {
+	
+	// function onEditNote() {
+	// 	dispatch({ type: 'HIDE_MENU' });
+	// 	dispatchNote({ type: 'OPEN_FORM' });
+	// 	if (state.noteItem) {
+	// 		dispatchNote({
+	// 			type: 'SET_TITLE',
+	// 			payload: state.noteItem?.title,
+	// 		});
+	// 		dispatchNote({
+	// 			type: 'SET_TEXT',
+	// 			payload: state.noteItem?.content,
+	// 		});
+	// 	}
+	// }
+
+	const onEditNote = useCallback(() => {
 		dispatch({ type: 'HIDE_MENU' });
 		dispatchNote({ type: 'OPEN_FORM' });
 		if (state.noteItem) {
@@ -292,15 +319,25 @@ export default function Note() {
 				payload: state.noteItem?.content,
 			});
 		}
-	}
+	},[dispatch, dispatchNote, state.noteItem]);
 
-	function onDeleteNote(item: Note) {
+
+	// function onDeleteNote(item: Note) {
+	// 	dispatch({ type: 'CLOSE_MENU' });
+	// 	dispatchNote({
+	// 		type: 'DELETE_NOTE',
+	// 		payload: { id: item.id },
+	// 	});
+	// };
+
+	const onDeleteNote = useCallback((item: Note) => {
 		dispatch({ type: 'CLOSE_MENU' });
 		dispatchNote({
 			type: 'DELETE_NOTE',
 			payload: { id: item.id },
 		});
-	}
+	},[dispatch, dispatchNote]);
+
 
 	function onSetStatusCompleted(item: Note) {
 		dispatchNote({
