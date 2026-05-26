@@ -160,4 +160,5 @@ export type SidebarContextType = SidebarProp & {
   id: string;
   isPanding: boolean;
   startTransition: (callback: () => void) => void;
+  parser: ((value: string) => string) | null;
 };

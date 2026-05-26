@@ -1,4 +1,4 @@
-import { useContext, createContext, useId, useReducer, useTransition, useMemo } from 'react';
+import { useContext, createContext, useId, useReducer, useTransition, useMemo, useEffect, useState } from 'react';
 import {
 	type SiderbarState,
 	type SidebarAction,
@@ -58,21 +58,21 @@ const isPandingWrapper = 'flex flex-col gap-[10px]';
 const isPandingLoader = 'flex w-[70px] h-[70px] bg-transparent border-[5px] border-solid border-t-[#1976d3] border-r-transparent border-b-[#1976d3] border-l-transparent rounded-full animate-spin';
 const isPandingText = 'text-[#1976d3] text-[16px] font-[Roboto, sans-serif] font-normal';
 
-const markDownParser = (value: string):string =>{
-	return value
-		.replace(/^# (.+)/gm, '<h1>$1</h1>')
-		.replace(/^## (.+)/gm, '<h2>$1</h2>')
-		.replace(/^### (.+)/gm, '<h3>$1</h3>')
-		.replace(/^#### (.+)/gm, '<h4>$1</h4>')
-		.replace(/^##### (.+)/gm, '<h5>$1</h5>')
-		.replace(/^###### (.+)/gm, '<h6>$1</h6>')
-		.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-		.replace(/^__(.+?)__/g, '<b>$1</b>')
-		.replace(/\*(.+?)\*/g, '<em>$1</em>')
-		.replace(/^_(.+?)/gm, '<i>$1</i>')
-		.replace(/^`(.+?)/gm, '<code>$1</code>')
-		.replace(/^```(.+?)/gm, '<pre><code>$1</code><pre>');
-};
+// const markDownParser = (value: string):string =>{
+// 	return value
+// 		.replace(/^# (.+)/gm, '<h1>$1</h1>')
+// 		.replace(/^## (.+)/gm, '<h2>$1</h2>')
+// 		.replace(/^### (.+)/gm, '<h3>$1</h3>')
+// 		.replace(/^#### (.+)/gm, '<h4>$1</h4>')
+// 		.replace(/^##### (.+)/gm, '<h5>$1</h5>')
+// 		.replace(/^###### (.+)/gm, '<h6>$1</h6>')
+// 		.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+// 		.replace(/^__(.+?)__/g, '<b>$1</b>')
+// 		.replace(/\*(.+?)\*/g, '<em>$1</em>')
+// 		.replace(/^_(.+?)/gm, '<i>$1</i>')
+// 		.replace(/^`(.+?)/gm, '<code>$1</code>')
+// 		.replace(/^```(.+?)/gm, '<pre><code>$1</code><pre>');
+// };
 
 // const arrEmpty = 'flex flex-col items-center justify-center opacity-50 h-full';
 
@@ -133,11 +133,16 @@ const SidebarComponent = ({
 		reduceSidebar,
 		InitialSidebarState,
 	);
+	const[parser, setParser] = useState<((value: string) => string) | null>(null);
 	const [isPanding, startTransition] = useTransition();
 
 	const id = useId();
+
+	useEffect(() => {
+		import('./markDown').then((result) => {setParser(() => result.default)});
+	},[]);
 	return (
-		<SidebarContext.Provider
+		<SidebarContext
 			value={{
 				...SidebarProp,
 				stateSidebar,
@@ -145,10 +150,11 @@ const SidebarComponent = ({
 				id,
 				isPanding,
 				startTransition,
+				parser
 			}}
 		>
 			{children}
-		</SidebarContext.Provider>
+		</SidebarContext>
 	);
 };
 
