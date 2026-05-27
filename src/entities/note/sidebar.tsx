@@ -5,7 +5,7 @@ import {
 	type SidebarProp,
 	type SidebarContextType,
 } from './model/types';
-// import { title } from 'process';
+import { preload } from 'react-dom';
 
 const sidebar = 'flex flex-col flex-1 gap-[30px] w-full ';
 
@@ -118,7 +118,12 @@ function reduceSidebar(state: SiderbarState, action: SidebarAction) {
 			filterStatusCompleted: !state.filterStatusCompleted,
 		};
 	}
-}
+};
+
+preload('https://www.fontshare.com/fonts/satoshi.woff2', {
+	as:'font',
+	type: 'font/woff2'
+});
 
 const SidebarContext = createContext<SidebarContextType | null>(null);
 
@@ -137,6 +142,7 @@ const SidebarComponent = ({
 	const [isPanding, startTransition] = useTransition();
 
 	const id = useId();
+
 
 	useEffect(() => {
 		import('./markDown')
