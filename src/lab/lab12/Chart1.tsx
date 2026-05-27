@@ -36,3 +36,4 @@ export default function LazyChart1({isShow}: {isShow: LazyPropType}){
 		</>
 	);
 };
+

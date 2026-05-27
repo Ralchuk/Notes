@@ -399,10 +399,12 @@ export default function Note() {
 	}
 
 	return (
-		<>
+		<> 
+			{stateNote.isOpen && <title>{stateNote.title}</title>}
 			<div className={container}>
 				{stateNote.isOpen && (
 					<ModalWrapper onClose={onClose}>
+						
 						<h2 className='text-[32px] text-[#1976d3] font-[Roboto, sans-serif] font-medium'>
 							Create note
 						</h2>

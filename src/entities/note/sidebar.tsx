@@ -139,7 +139,10 @@ const SidebarComponent = ({
 	const id = useId();
 
 	useEffect(() => {
-		import('./markDown').then((result) => {setParser(() => result.default)});
+		import('./markDown')
+			.then((result) => {
+				setParser(() => result.default);
+			});
 	},[]);
 	return (
 		<SidebarContext
@@ -251,6 +254,7 @@ const SidebarList = () => {
 	const notes = context?.notes;
 	const deferredShowTitle = context?.stateSidebar.deferredShowTitle ?? '';
 	const deferredShowContent = context?.stateSidebar.deferredShowContent ?? '';
+	const parser = context?.parser ?? null;
 
 	const filterInProgress = useMemo(() => {
 		if (!notes) return;
@@ -263,11 +267,11 @@ const SidebarList = () => {
 			)
 			.map((item) => ({
 				...item,
-				parsedTitle: markDownParser(item.title),
-				parsedContent: markDownParser(item.content),
+				parsedTitle: parser ? parser(item.title) : item.title,
+				parsedContent: parser ? parser(item.content) : item.content,
 			}));
 	},
-	[notes, deferredShowTitle, deferredShowContent]);
+	[notes, deferredShowTitle, deferredShowContent, parser]);
 
 	// function filterInProgress(){
 	// 	if (!notes) return;
@@ -296,11 +300,11 @@ const SidebarList = () => {
 			)
 			.map((item) => ({
 				...item,
-				parsedTitle: markDownParser(item.title),
-				parsedContent: markDownParser(item.content),
+				parsedTitle: parser ? parser(item.title) : item.title,
+				parsedContent: parser ? parser(item.content) : item.content,
 			}));
 	},
-	[notes, deferredShowTitle, deferredShowContent]);
+	[notes, deferredShowTitle, deferredShowContent, parser]);
 
 	// function filterCompleted(){
 	// 	if (!notes) return;
