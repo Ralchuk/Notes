@@ -35,8 +35,8 @@ const itemNote =
 	'flex flex-col  bg-[#1976d3]/80 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px]';
 const itemNoteHeader = 'flex flex-col gap-[10px]';
 const itemNoteTitle =
-	'text-white text-[32px] font-[Roboto, sans-serif] font-medium';
-const itemNoteContent = 'text-white text-[16px] font-[Roboto, sans-serif]';
+	'text-white text-[32px] font-satoshi font-medium';
+const itemNoteContent = 'text-white text-[16px] font-satoshi';
 const itemNoteDate =
 	'text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
 
@@ -45,9 +45,9 @@ const itemNoteCompleted =
 	'flex flex-col   bg-black/25 px-[30px] py-[10px] rounded-[15px] overflow-hidden gap-[5px] dark:border-[1px] dark:border-[#1976d3]';
 const itemNoteHeaderCompleted = 'flex flex-col gap-[10px]';
 const itemNoteTitleCompleted =
-	'text-white text-[32px] font-[Roboto, sans-serif] font-medium';
+	'text-white text-[32px] font-satoshi font-medium';
 const itemNoteContentCompleted =
-	'text-white text-[16px] font-[Roboto, sans-serif]';
+	'text-white text-[16px] font-satoshi';
 const itemNoteDateCompleted =
 	'text-white/50 text-[12px] font-[Roboto, sans-serif] font-bold text-end';
 
@@ -57,6 +57,7 @@ const isPandingbg = 'flex w-full h-full absolute bg-white/75 justify-center item
 const isPandingWrapper = 'flex flex-col gap-[10px]';
 const isPandingLoader = 'flex w-[70px] h-[70px] bg-transparent border-[5px] border-solid border-t-[#1976d3] border-r-transparent border-b-[#1976d3] border-l-transparent rounded-full animate-spin';
 const isPandingText = 'text-[#1976d3] text-[16px] font-[Roboto, sans-serif] font-normal';
+
 
 // const markDownParser = (value: string):string =>{
 // 	return value
