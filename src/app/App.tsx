@@ -1,14 +1,16 @@
-import Note from '@/entities/note/note';
-import ThemeComponent from '@/entities/note/theme';
+// import Note from '@/entities/note/note';
+// import ThemeComponent from '@/entities/note/theme';
+import SocialInputs from '@/lab/ReactHookForm';
 
 
 
 function App() {
 	return (
 		<>
-			<ThemeComponent>
+			{/* <ThemeComponent>
 				<Note/>
-			</ThemeComponent>
+			</ThemeComponent> */}
+			<SocialInputs/>
 		</>
 	);
 }
