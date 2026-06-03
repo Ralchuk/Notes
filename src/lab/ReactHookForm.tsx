@@ -1,16 +1,29 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
+import z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-type SocialType = {
-	nickname: {
-		brand: 'Instagram' | 'Facebook' | 'Twitter' | null;
-		value:string}[];
-}
+// type SocialType = {
+// 	nickname: {
+// 		brand: 'Instagram' | 'Facebook' | 'Twitter' | null;
+// 		value:string}[];
+// };
+
+const socialNetworks = z.object({
+	nickname: z.array(
+		z.object({
+			brand: z.enum(['Instagram', 'Facebook', 'Twitter']).nullable(),
+			value: z.string().includes('@',{message:'Need to use "@" at start'})
+		}))
+});
+
+type SocialType = z.infer<typeof socialNetworks>;
+
+
 
 const SocialInputs = () => {
-	const{register, control, handleSubmit} = useForm<SocialType>({
-		defaultValues: {
-			nickname: []}
+	const{register, control, handleSubmit, formState: {errors}} = useForm<SocialType>({
+		resolver: zodResolver(socialNetworks)
 	}
 	);
 
@@ -21,8 +34,6 @@ const SocialInputs = () => {
 		}
 		
 	};	
-
-	
 
 	const{append, remove, fields} = useFieldArray({
 		control,
@@ -57,6 +68,7 @@ const SocialInputs = () => {
 								key={field.id}
 								{...register(`nickname.${index}.value`)}
 								placeholder={field.brand ? field.brand : 'Type here...'}/>
+							{errors.nickname?.[index]?.value?.message && <p className='italic text-red-300 pl-[10px] '>{errors.nickname?.[index]?.value?.message}</p>}
 						</div>
 						
 					))}
