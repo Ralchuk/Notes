@@ -42,7 +42,8 @@ export type MenuAction =
     };
 
 export type NoteState = {
-  isOpen: boolean,
+  isOpenForm: boolean,
+  isOpenUserProfile: boolean,
   note: Note[],
   title: string,
   text: string,
@@ -52,6 +53,12 @@ export type NoteState = {
 export type NoteAction = 
 | {
   type: 'OPEN_FORM',
+}
+| {
+  type: 'OPEN_USER_PROFILE'
+}
+| {
+  type: 'CLOSE_USER_PROFILE'
 }
 | {
   type: 'SET_TITLE',

@@ -2,6 +2,7 @@ import Form from '@/entities/note/form';
 import ContextMenu from './contextMenu';
 import Sidebar from './sidebar';
 import ModalWrapper from './modalForm';
+import UserProfileWrapper from './userProfileWrapper';
 import { NoteContextDispatch, NoteContextState } from './theme';
 import Empty_note from '../../../img/undraw_add-notes_9xls.svg';
 
@@ -43,7 +44,8 @@ const arrEmptySvg ='grayscale absolute top-1/2 left-1/2 -translate-x-1/2 -transl
 // reducer для заметок
 
 const initialStateNote: NoteState = {
-	isOpen: false,
+	isOpenForm: false,
+	isOpenUserProfile: false,
 	note: [],
 	title: '',
 	text: '',
@@ -55,7 +57,17 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
 	case 'OPEN_FORM':
 		return {
 			...state,
-			isOpen: true,
+			isOpenForm: true,
+		};
+	case 'OPEN_USER_PROFILE':
+		return {
+			...state,
+			isOpenUserProfile: true,
+		};
+	case 'CLOSE_USER_PROFILE':
+		return {
+			...state,
+			isOpenUserProfile: false,
 		};
 	case 'SET_TITLE':
 		return {
@@ -82,7 +94,7 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
 			],
 			title: '',
 			text: '',
-			isOpen: false,
+			isOpenForm: false,
 		};
 	case 'CLEAR_FORM':
 		return {
@@ -95,7 +107,7 @@ function reducerNote(state: NoteState, action: NoteAction): NoteState {
 			...state,
 			title: '',
 			text: '',
-			isOpen: false,
+			isOpenForm: false,
 		};
 	case 'CLEAR_NOTES':
 		return {
@@ -214,12 +226,20 @@ export default function Note() {
 		});
 	}
 
-	function onClose() {
+	function onCloseForm() {
 		dispatchNote({ type: 'CLOSE_FORM' });
 	}
 
-	function onOpen() {
+	function onCloseUserProfile() {
+		dispatchNote({ type: 'CLOSE_USER_PROFILE' });
+	}
+
+	function onOpenForm() {
 		dispatchNote({ type: 'OPEN_FORM' });
+	}
+
+	function onOpenUserProfile() {
+		dispatchNote({ type: 'OPEN_USER_PROFILE' });
 	}
 
 	function setTitle(value: string) {
@@ -401,10 +421,10 @@ export default function Note() {
 
 	return (
 		<> 
-			{stateNote.isOpen && <title>{stateNote.title}</title>}
+			{stateNote.isOpenForm && <title>{stateNote.title}</title>}
 			<div className={container}>
-				{stateNote.isOpen && (
-					<ModalWrapper onClose={onClose}>
+				{stateNote.isOpenForm && (
+					<ModalWrapper onClose={onCloseForm}>
 						
 						<h2 className='text-[32px] text-[#1976d3] font-[Roboto, sans-serif] font-medium'>
 							Create note
@@ -435,12 +455,25 @@ export default function Note() {
 						</div>
 					</ModalWrapper>
 				)}
+				{stateNote.isOpenUserProfile && (
+					<UserProfileWrapper onClose={onCloseUserProfile}>
+						
+						<h2 className='text-[32px] text-[#1976d3] font-[Roboto, sans-serif] font-medium'>
+							User Profile
+						</h2>
+						
+					</UserProfileWrapper>
+				)}
 				<div className={noteHeader}>
+					<div>
+						<button
+							onClick={onOpenUserProfile}>Create User</button>
+					</div>
 					<div className={headerNoteBtn}>
 						
 						<button
 							className={btnCreate}
-							onClick={onOpen}
+							onClick={onOpenForm}
 						>
 							Open
 						</button>
