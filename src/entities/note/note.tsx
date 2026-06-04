@@ -3,6 +3,7 @@ import ContextMenu from './contextMenu';
 import Sidebar from './sidebar';
 import ModalWrapper from './modalForm';
 import UserProfileWrapper from './userProfileWrapper';
+import UserProfileForm from './userProfile';
 import { NoteContextDispatch, NoteContextState } from './theme';
 import Empty_note from '../../../img/undraw_add-notes_9xls.svg';
 
@@ -21,7 +22,7 @@ import { useEffect, useRef, useReducer, useContext, useCallback } from 'react';
 const container =
 	'flex flex-col items-center content-center w-full  items-center h-screen bg-white dark:bg-[#07151e]';
 const noteHeader =
-	'flex flex-r justify-stretch w-full items-center pt-[30px] pb-[30px] gap-[15px] border-b border-[#1976d3]';
+	'flex flex-r justify-stretch w-full items-center pt-[30px] pb-[30px] px-[20px] gap-[15px] border-b border-[#1976d3]';
 const noteBody = 'flex w-full flex-1 h-screen overflow-hidden';
 
 // header
@@ -457,17 +458,19 @@ export default function Note() {
 				)}
 				{stateNote.isOpenUserProfile && (
 					<UserProfileWrapper onClose={onCloseUserProfile}>
-						
-						<h2 className='text-[32px] text-[#1976d3] font-[Roboto, sans-serif] font-medium'>
-							User Profile
-						</h2>
-						
+						<UserProfileForm onClose={onCloseUserProfile}/>
 					</UserProfileWrapper>
 				)}
 				<div className={noteHeader}>
 					<div>
 						<button
-							onClick={onOpenUserProfile}>Create User</button>
+							className='flex text-[16px] items-baseline justify-center hover:opacity-60 cursor-pointer'
+							onClick={onOpenUserProfile}>
+							<span
+								className=' text-[20px]'>🙋‍♂️</span>
+							<span
+							 	className='text-[#1976d3] font-[Roboto, sans-serif] font-medium capitalize gap-[8px] whitespace-nowrap hover:underline transition-all duration-200 '>User profile</span>
+						</button>
 					</div>
 					<div className={headerNoteBtn}>
 						
