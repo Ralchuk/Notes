@@ -257,9 +257,7 @@ export default function Note() {
 		});
 	}
 
-	function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-		e.preventDefault();
-
+	function handleSubmit() {
 		if (!stateNote.title.trim() || !stateNote.text.trim()) return;
 		if (state.noteItem) {
 			dispatch({ type: 'CLOSE_MENU' });
@@ -437,23 +435,8 @@ export default function Note() {
 							setText={setText}
 							onSubmit={handleSubmit}
 							auto={auto}
+							handleClearForm={handleClearForm}
 						/>
-						<div className='flex justify-center gap-[10px]'>
-							<button
-								autoFocus
-								className={btnCreate}
-								type='submit'
-								form='note-form'
-							>
-								Save
-							</button>
-							<button
-								className={btnClear}
-								onClick={handleClearForm}
-							>
-								Clear
-							</button>
-						</div>
 					</ModalWrapper>
 				)}
 				{stateNote.isOpenUserProfile && (

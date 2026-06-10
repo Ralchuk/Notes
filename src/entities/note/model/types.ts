@@ -11,13 +11,15 @@ export type PropForm = {
     text: string,
     setTitle: (value: string) => void,
     setText: (value: string) => void,
-    onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void,
+    onSubmit: () => void,
+    handleClearForm: () => void,
     auto: React.RefObject<AutoResizeTextareaHandle | null>,
 };
 
 export type PropResizingTextarea = {
     text: string,
     setText: (value: string) => void,
+    errorTextArea: string | undefined,
 };
 
 export type MenuState = {

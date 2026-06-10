@@ -1,14 +1,12 @@
 import Note from '@/entities/note/note';
 import ThemeComponent from '@/entities/note/theme';
-import FormActionComponent from '@/lab/FormAction';
 
 function App() {
 	return (
 		<>
-			{/* <ThemeComponent>
+			<ThemeComponent>
 				<Note/>
-			</ThemeComponent> */}
-			<FormActionComponent/>
+			</ThemeComponent>
 		</>
 	);
 }
