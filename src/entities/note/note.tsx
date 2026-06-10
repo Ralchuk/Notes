@@ -15,7 +15,7 @@ import {
 	type NoteState,
 	type NoteAction,
 } from './model/types';
-import { useEffect, useRef, useReducer, useContext, useCallback } from 'react';
+import { useEffect, useRef, useReducer, useContext, useCallback, useOptimistic } from 'react';
 
 
 // main classes
@@ -211,14 +211,13 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
 export default function Note() {
 	// useReducer Note
 	const [stateNote, dispatchNote] = useReducer(reducerNote, initialStateNote);
+	const [optimisticNotes, setOptimisticNotes] = useOptimistic(stateNote.note);
 
 	// useReducer ContexMenu
 
 	const auto = useRef<AutoResizeTextareaHandle | null>(null);
 
 	const [state, dispatch] = useReducer(reducer, initialState);
-
-	
 
 	function onCreate() {
 		dispatchNote({
