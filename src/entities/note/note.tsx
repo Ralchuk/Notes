@@ -15,7 +15,7 @@ import {
 	type NoteState,
 	type NoteAction,
 } from './model/types';
-import { useEffect, useRef, useReducer, useContext, useCallback, useOptimistic } from 'react';
+import { useEffect, useRef, useReducer, useContext, useCallback, useOptimistic} from 'react';
 
 
 // main classes
@@ -211,8 +211,7 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
 export default function Note() {
 	// useReducer Note
 	const [stateNote, dispatchNote] = useReducer(reducerNote, initialStateNote);
-	const [optimisticNotes, setOptimisticNotes] = useOptimistic(stateNote.note);
-
+	const [optimisticNotes, setOptimisticNotes] = useOptimistic<Note[], Note>(stateNote.note, ((prevNotes, nextNotes) => [...prevNotes, nextNotes]));
 	// useReducer ContexMenu
 
 	const auto = useRef<AutoResizeTextareaHandle | null>(null);
@@ -258,17 +257,23 @@ export default function Note() {
 
 	function handleSubmit() {
 		if (!stateNote.title.trim() || !stateNote.text.trim()) return;
+		
+		setOptimisticNotes({
+			id: Date.now().toString(),
+			createdAt: new Date(),
+			title: stateNote.title,
+			content: stateNote.text,
+			status: 'inprogress',
+		});
+
 		if (state.noteItem) {
 			dispatch({ type: 'CLOSE_MENU' });
-			dispatchNote({
-				type: 'EDIT_NOTE',
-				payload: {
-					id: state.noteItem.id,
-					title: stateNote.title,
-					content: stateNote.text,
-					createdAt: new Date(),
-				},
-			});
+			dispatchNote({ type: 'EDIT_NOTE', payload: { 
+				id: state.noteItem.id,
+				title: stateNote.title,
+				content: stateNote.text,
+				createdAt: new Date(),
+			}  });
 		} else {
 			onCreate();
 		}
@@ -435,6 +440,7 @@ export default function Note() {
 							onSubmit={handleSubmit}
 							auto={auto}
 							handleClearForm={handleClearForm}
+
 						/>
 					</ModalWrapper>
 				)}
@@ -492,10 +498,10 @@ export default function Note() {
 				</div>
 				<div className={noteBody}>
 					<div className={sidebarWrapper}>
-						{stateNote.note.length !== 0 ? (
+						{optimisticNotes.length !== 0 ? (
 							<Sidebar
 								SidebarProp={{
-									notes: stateNote.note,
+									notes: optimisticNotes,
 									onContextMenu: onContextMenu,
 									onEditNote: onEditNote,
 									onDeleteNote: onDeleteNote,
