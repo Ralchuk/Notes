@@ -6,14 +6,12 @@ import UserProfileWrapper from './userProfileWrapper';
 import UserProfileForm from './userProfile';
 import { NoteContextDispatch, NoteContextState } from './theme';
 import Empty_note from '../../../img/undraw_add-notes_9xls.svg';
-
+import { useReduceNote } from '../../../store/storeReducerNote';
 import {
 	type Note,
 	type MenuAction,
 	type MenuState,
 	type AutoResizeTextareaHandle,
-	type NoteState,
-	type NoteAction,
 } from './model/types';
 import { useEffect, useRef, useReducer, useContext, useCallback, useOptimistic} from 'react';
 
@@ -42,135 +40,6 @@ const arrEmptyText = 'font-[Roboto, sans-serif] font-medium text-[18px] absolute
 const Empty_note_round = 'flex w-[300px] h-[300px] rounded-full relative bg-gray-300 -z-1 ';
 const arrEmptySvg ='grayscale absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
 
-// reducer для заметок
-
-const initialStateNote: NoteState = {
-	isOpenForm: false,
-	isOpenUserProfile: false,
-	note: [],
-	title: '',
-	text: '',
-	status: 'inprogress',
-};
-
-function reducerNote(state: NoteState, action: NoteAction): NoteState {
-	switch (action.type) {
-	case 'OPEN_FORM':
-		return {
-			...state,
-			isOpenForm: true,
-		};
-	case 'OPEN_USER_PROFILE':
-		return {
-			...state,
-			isOpenUserProfile: true,
-		};
-	case 'CLOSE_USER_PROFILE':
-		return {
-			...state,
-			isOpenUserProfile: false,
-		};
-	case 'SET_TITLE':
-		return {
-			...state,
-			title: action.payload,
-		};
-	case 'SET_TEXT':
-		return {
-			...state,
-			text: action.payload,
-		};
-	case 'SAVE_NOTE':
-		return {
-			...state,
-			note: [
-				...state.note,
-				{
-					id: Date.now().toString(),
-					createdAt: new Date(),
-					content: action.payload.text,
-					title: action.payload.title,
-					status: 'inprogress',
-				},
-			],
-			title: '',
-			text: '',
-			isOpenForm: false,
-		};
-	case 'CLEAR_FORM':
-		return {
-			...state,
-			title: '',
-			text: '',
-		};
-	case 'CLOSE_FORM':
-		return {
-			...state,
-			title: '',
-			text: '',
-			isOpenForm: false,
-		};
-	case 'CLEAR_NOTES':
-		return {
-			...state,
-			note: [],
-		};
-	case 'DELETE_NOTE':
-		return {
-			...state,
-			note: [...state.note.filter((n) => n.id !== action.payload.id)],
-		};
-	case 'EDIT_NOTE':
-		return {
-			...state,
-			note: [
-				...state.note.map((n) =>
-					n.id === action.payload.id
-						? {
-							...n,
-							title: action.payload.title,
-							content: action.payload.content,
-							createdAt: action.payload.createdAt,
-						}
-						: n,
-				),
-			],
-		};
-	case 'SET_STATUS_INPROGRESS':
-		return {
-			...state,
-			note: [
-				...state.note.map((n) =>
-					n.id === action.payload.id
-						? {
-							...n,
-							status: 'inprogress' as const,
-						}
-						: n,
-				),
-			],
-		};
-	case 'SET_STATUS_COMPLETED':
-		return {
-			...state,
-			note: [
-				...state.note.map((n) =>
-					n.id === action.payload.id
-						? {
-							...n,
-							status: 'completed' as const,
-						}
-						: n,
-				),
-			],
-		};
-	case 'SET_FILTER':
-		return {
-			...state,
-			status: action.payload,
-		};
-	}
-}
 
 // reducer для контекстного меню
 
@@ -210,85 +79,84 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
 
 export default function Note() {
 	// useReducer Note
-	const [stateNote, dispatchNote] = useReducer(reducerNote, initialStateNote);
-	const [optimisticNotes, setOptimisticNotes] = useOptimistic<Note[], Note>(stateNote.note, ((prevNotes, nextNotes) => [...prevNotes, nextNotes]));
+	
 	// useReducer ContexMenu
+	const {isOpenForm, isOpenUserProfile, note, title, text} = useReduceNote();
+	const setIsOpenForm = useReduceNote((state) => state.setIsOpenForm);
+	const setIsCloseForm = useReduceNote((state) => state.setIsCloseForm);
+	const setIsOpenUserProfile = useReduceNote((state) => state.setIsOpenUserProfile);
+	const setIsCloseUserProfile = useReduceNote((state) => state.setIsCloseUserProfile);
+	const saveNote = useReduceNote((state) => state.saveNote);
+	const editNote = useReduceNote((state) => state.editNote);
+	const deleteNote = useReduceNote((state) => state.deleteNote);
+	const clearNotes = useReduceNote((state) => state.clearNotes);
+	const setTitle = useReduceNote((state) => state.setTitle);
+	const setText = useReduceNote((state) => state.setText);
+	const setStatusCompleted = useReduceNote((state) => state.setStatusCompleted);
+	const setStatusInprogress = useReduceNote((state) => state.setStatusInprogress);
+
+	const [optimisticNotes, setOptimisticNotes] = useOptimistic<Note[], Note>(note, ((prevNotes, nextNotes) => [...prevNotes, nextNotes]));
 
 	const auto = useRef<AutoResizeTextareaHandle | null>(null);
 
 	const [state, dispatch] = useReducer(reducer, initialState);
 
 	function onCreate() {
-		dispatchNote({
-			type: 'SAVE_NOTE',
-			payload: { title: stateNote.title, text: stateNote.text },
-		});
+		saveNote({text, title});
 	}
 
 	function onCloseForm() {
-		dispatchNote({ type: 'CLOSE_FORM' });
+		setIsCloseForm();
 	}
 
 	function onCloseUserProfile() {
-		dispatchNote({ type: 'CLOSE_USER_PROFILE' });
+		setIsCloseUserProfile();
 	}
 
 	function onOpenForm() {
-		dispatchNote({ type: 'OPEN_FORM' });
+		setIsOpenForm();
 	}
 
 	function onOpenUserProfile() {
-		dispatchNote({ type: 'OPEN_USER_PROFILE' });
+		setIsOpenUserProfile();
 	}
 
-	function setTitle(value: string) {
-		dispatchNote({
-			type: 'SET_TITLE',
-			payload: value,
-		});
+	function setTitleNote(value: string) {
+		setTitle(value);
 	}
 
-	function setText(value: string) {
-		dispatchNote({
-			type: 'SET_TEXT',
-			payload: value,
-		});
+	function setTextNote(value: string) {
+		setText(value);
 	}
 
 	function handleSubmit() {
-		if (!stateNote.title.trim() || !stateNote.text.trim()) return;
+		if (!title.trim() || !text.trim()) return;
 		
 		setOptimisticNotes({
 			id: Date.now().toString(),
 			createdAt: new Date(),
-			title: stateNote.title,
-			content: stateNote.text,
+			title: title,
+			content: text,
 			status: 'inprogress',
 		});
 
 		if (state.noteItem) {
 			dispatch({ type: 'CLOSE_MENU' });
-			dispatchNote({ type: 'EDIT_NOTE', payload: { 
-				id: state.noteItem.id,
-				title: stateNote.title,
-				content: stateNote.text,
-				createdAt: new Date(),
-			}  });
+			editNote(state.noteItem.id, text, title);
 		} else {
 			onCreate();
 		}
-		dispatchNote({ type: 'CLOSE_FORM' });
+		setIsCloseForm();
 	}
 
 	function handleCleanNotes() {
-		dispatchNote({ type: 'CLEAR_NOTES' });
+		clearNotes();
 		// setNote([]);
 	}
 
 	function handleClearForm() {
-		dispatchNote({ type: 'CLEAR_FORM' });
-		// setTitle('');
-		auto.current?.resetAndFocus();
+		setTitle('');
+		setText('');
 	}
 
 	// Контекстне меню
@@ -332,18 +200,12 @@ export default function Note() {
 
 	const onEditNote = useCallback(() => {
 		dispatch({ type: 'HIDE_MENU' });
-		dispatchNote({ type: 'OPEN_FORM' });
+		setIsOpenForm();
 		if (state.noteItem) {
-			dispatchNote({
-				type: 'SET_TITLE',
-				payload: state.noteItem?.title,
-			});
-			dispatchNote({
-				type: 'SET_TEXT',
-				payload: state.noteItem?.content,
-			});
+			setTitle(state.noteItem.title);
+			setText(state.noteItem.content);
 		}
-	},[dispatch, dispatchNote, state.noteItem]);
+	}, [dispatch, setIsOpenForm, setTitle, setText, state.noteItem]);
 
 
 	// function onDeleteNote(item: Note) {
@@ -356,26 +218,17 @@ export default function Note() {
 
 	const onDeleteNote = useCallback((item: Note) => {
 		dispatch({ type: 'CLOSE_MENU' });
-		dispatchNote({
-			type: 'DELETE_NOTE',
-			payload: { id: item.id },
-		});
-	},[dispatch, dispatchNote]);
+		deleteNote(item.id);
+	},[dispatch, deleteNote]);
 
 
 	function onSetStatusCompleted(item: Note) {
-		dispatchNote({
-			type: 'SET_STATUS_COMPLETED',
-			payload: { id: item.id },
-		});
+		setStatusCompleted(item.id);
 		dispatch({ type: 'CLOSE_MENU' });
 	}
 
 	function onSetStatusInprogress(item: Note) {
-		dispatchNote({
-			type: 'SET_STATUS_INPROGRESS',
-			payload: { id: item.id },
-		});
+		setStatusInprogress(item.id);
 		dispatch({ type: 'CLOSE_MENU' });
 	}
 
@@ -424,19 +277,19 @@ export default function Note() {
 
 	return (
 		<> 
-			{stateNote.isOpenForm && <title>{stateNote.title}</title>}
+			{isOpenForm && <title>{title}</title>}
 			<div className={container}>
-				{stateNote.isOpenForm && (
+				{isOpenForm && (
 					<ModalWrapper onClose={onCloseForm}>
 						
 						<h2 className='text-[32px] text-[#1976d3] font-[Roboto, sans-serif] font-medium'>
 							Create note
 						</h2>
 						<Form
-							title={stateNote.title}
-							text={stateNote.text}
-							setTitle={setTitle}
-							setText={setText}
+							title={title}
+							text={text}
+							setTitle={setTitleNote}
+							setText={setTextNote}
 							onSubmit={handleSubmit}
 							auto={auto}
 							handleClearForm={handleClearForm}
@@ -444,7 +297,7 @@ export default function Note() {
 						/>
 					</ModalWrapper>
 				)}
-				{stateNote.isOpenUserProfile && (
+				{isOpenUserProfile && (
 					<UserProfileWrapper onClose={onCloseUserProfile}>
 						<UserProfileForm onClose={onCloseUserProfile}/>
 					</UserProfileWrapper>
