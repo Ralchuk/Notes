@@ -14,6 +14,7 @@ import {
 	type AutoResizeTextareaHandle,
 } from './model/types';
 import { useEffect, useRef, useReducer, useContext, useCallback, useOptimistic} from 'react';
+import useOnlineStatus from '../hooks/useOnlineStatus';
 
 
 // main classes
@@ -78,9 +79,8 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
 }
 
 export default function Note() {
-	// useReducer Note
 	
-	// useReducer ContexMenu
+
 	const {isOpenForm, isOpenUserProfile, note, title, text} = useReduceNote();
 	const setIsOpenForm = useReduceNote((state) => state.setIsOpenForm);
 	const setIsCloseForm = useReduceNote((state) => state.setIsCloseForm);
@@ -100,6 +100,8 @@ export default function Note() {
 	const auto = useRef<AutoResizeTextareaHandle | null>(null);
 
 	const [state, dispatch] = useReducer(reducer, initialState);
+
+	const online = useOnlineStatus();
 
 	function onCreate() {
 		saveNote({text, title});
@@ -281,7 +283,6 @@ export default function Note() {
 			<div className={container}>
 				{isOpenForm && (
 					<ModalWrapper onClose={onCloseForm}>
-						
 						<h2 className='text-[32px] text-[#1976d3] font-[Roboto, sans-serif] font-medium'>
 							Create note
 						</h2>
@@ -303,6 +304,14 @@ export default function Note() {
 					</UserProfileWrapper>
 				)}
 				<div className={noteHeader}>
+					<div>
+						{online ? <p
+							className="lowercase text-green-500 before:content-['●']"
+						>online
+						</p> : <p
+							className="lowercase text-red-500 before:content-['●']"
+						>offline</p>}
+					</div>
 					<div>
 						<button
 							className='flex text-[16px] items-baseline justify-center hover:opacity-60 cursor-pointer'
