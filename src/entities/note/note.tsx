@@ -6,7 +6,7 @@ import UserProfileWrapper from './userProfileWrapper';
 import UserProfileForm from './userProfile';
 import { NoteContextDispatch, NoteContextState } from './theme';
 import Empty_note from '../../../img/undraw_add-notes_9xls.svg';
-import { useReduceNote } from '../../../store/storeReducerNote';
+import { useReduceNote, useReduceNoteForm, useReduceProfile } from '../../../store/storeReducerNote';
 import {
 	type Note,
 	type MenuAction,
@@ -81,17 +81,19 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
 export default function Note() {
 	
 
-	const {isOpenForm, isOpenUserProfile, note, title, text} = useReduceNote();
-	const setIsOpenForm = useReduceNote((state) => state.setIsOpenForm);
-	const setIsCloseForm = useReduceNote((state) => state.setIsCloseForm);
-	const setIsOpenUserProfile = useReduceNote((state) => state.setIsOpenUserProfile);
-	const setIsCloseUserProfile = useReduceNote((state) => state.setIsCloseUserProfile);
+	const {note} = useReduceNote();
+	const {isOpenForm, title, text} = useReduceNoteForm();
+	const {isOpenUserProfile} = useReduceProfile();
+	const setIsOpenForm = useReduceNoteForm((state) => state.setIsOpenForm);
+	const setIsCloseForm = useReduceNoteForm((state) => state.setIsCloseForm);
+	const setIsOpenUserProfile = useReduceProfile((state) => state.setIsOpenUserProfile);
+	const setIsCloseUserProfile = useReduceProfile((state) => state.setIsCloseUserProfile);
 	const saveNote = useReduceNote((state) => state.saveNote);
 	const editNote = useReduceNote((state) => state.editNote);
 	const deleteNote = useReduceNote((state) => state.deleteNote);
 	const clearNotes = useReduceNote((state) => state.clearNotes);
-	const setTitle = useReduceNote((state) => state.setTitle);
-	const setText = useReduceNote((state) => state.setText);
+	const setTitle = useReduceNoteForm((state) => state.setTitle);
+	const setText = useReduceNoteForm((state) => state.setText);
 	const setStatusCompleted = useReduceNote((state) => state.setStatusCompleted);
 	const setStatusInprogress = useReduceNote((state) => state.setStatusInprogress);
 
@@ -144,7 +146,7 @@ export default function Note() {
 
 		if (state.noteItem) {
 			dispatch({ type: 'CLOSE_MENU' });
-			editNote(state.noteItem.id, text, title);
+			editNote(state.noteItem.id, title, text);
 		} else {
 			onCreate();
 		}
