@@ -15,6 +15,7 @@ import {
 } from './model/types';
 import { useEffect, useRef, useReducer, useContext, useCallback, useOptimistic} from 'react';
 import useOnlineStatus from '../hooks/useOnlineStatus';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 
 // main classes
@@ -76,28 +77,126 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
 	default:
 		return state;
 	}
-}
+};
+
+
+
+const noteFetch = async() => {
+	const response = await fetch('http://localhost:3000/notes');
+	if(!response.ok)
+		throw new Error('invalid note');
+	return response.json();
+};
+
+const noteFetchSave = async(newNote: {title: string, content: string, status: 'inprogress' | 'completed', createdAt: Date}) => {
+	const response = await fetch('http://localhost:3000/notes', {
+		method: 'POST',
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify(newNote)
+	});
+	if(!response.ok)
+		throw new Error('invalid note');
+	return response.json();
+};
+
+const noteFetchEdit = async(id: string, editNote: {title: string, content: string }) => {
+	const response = await fetch(`http://localhost:3000/notes/${id}`, {
+		method: 'PATCH',
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify(editNote)
+	});
+	if(!response.ok)
+		throw new Error('invalid note');
+	return response.json();
+};
+
+const noteFetchStatus = async(id: string, editNote: {status: 'inprogress' | 'completed'}) => {
+	const response = await fetch(`http://localhost:3000/notes/${id}`, {
+		method: 'PATCH',
+		headers: {'Content-Type': 'application/json'},
+		body: JSON.stringify(editNote)
+	});
+	if(!response.ok)
+		throw new Error('invalid note');
+	return response.json();
+};
+
+const noteFetchDelete = async(id: string) => {
+	const response = await fetch(`http://localhost:3000/notes/${id}`, {
+		method: 'Delete',
+		headers: {'Content-Type': 'application/json'},
+	});
+	if(!response.ok)
+		throw new Error('invalid note');
+	return response.json();
+};
+
 
 export default function Note() {
+
+	const queryClient = useQueryClient();
+
+	const {data, isPending, error} = useQuery({
+		queryKey: ['notes'],
+		queryFn:() => noteFetch()
+	});
+
 	
 
-	const {note} = useReduceNote();
+	const {mutate} = useMutation({
+		mutationKey: ['new notes'],
+		mutationFn:(newNote: {title: string, content: string, status: 'inprogress' | 'completed', createdAt: Date}) => noteFetchSave(newNote),
+		onSuccess: () => {
+    		queryClient.invalidateQueries({
+      		queryKey: ['notes'], 
+			});
+		},
+	});
+
+	const {mutate: mutateEdit} = useMutation({
+		mutationKey: ['edit notes'],
+		mutationFn:({id, editNote}: {id: string, editNote:{title: string, content: string}}) => noteFetchEdit(id, editNote),
+		onSuccess: () => {
+    		queryClient.invalidateQueries({
+      		queryKey: ['notes'], 
+			});
+		},
+	});
+
+	const {mutate: mutateStatus} = useMutation({
+		mutationKey: ['edit notes status'],
+		mutationFn:({id, editNote}: {id: string, editNote:{status: 'inprogress' | 'completed'}}) => noteFetchStatus(id, editNote),
+		onSuccess: () => {
+    		queryClient.invalidateQueries({
+      		queryKey: ['notes'], 
+			});
+		},
+	});
+
+	const {mutate: mutateDelete} = useMutation({
+		mutationKey: ['delete notes'],
+		mutationFn:(id: string) => noteFetchDelete(id),
+		onSuccess: () => {
+    		queryClient.invalidateQueries({
+      		queryKey: ['notes'], 
+			});
+		},
+	});
+
 	const {isOpenForm, title, text} = useReduceNoteForm();
 	const {isOpenUserProfile} = useReduceProfile();
 	const setIsOpenForm = useReduceNoteForm((state) => state.setIsOpenForm);
 	const setIsCloseForm = useReduceNoteForm((state) => state.setIsCloseForm);
 	const setIsOpenUserProfile = useReduceProfile((state) => state.setIsOpenUserProfile);
 	const setIsCloseUserProfile = useReduceProfile((state) => state.setIsCloseUserProfile);
-	const saveNote = useReduceNote((state) => state.saveNote);
-	const editNote = useReduceNote((state) => state.editNote);
-	const deleteNote = useReduceNote((state) => state.deleteNote);
-	const clearNotes = useReduceNote((state) => state.clearNotes);
+
 	const setTitle = useReduceNoteForm((state) => state.setTitle);
 	const setText = useReduceNoteForm((state) => state.setText);
+
 	const setStatusCompleted = useReduceNote((state) => state.setStatusCompleted);
 	const setStatusInprogress = useReduceNote((state) => state.setStatusInprogress);
 
-	const [optimisticNotes, setOptimisticNotes] = useOptimistic<Note[], Note>(note, ((prevNotes, nextNotes) => [...prevNotes, nextNotes]));
+	const [optimisticNotes, setOptimisticNotes] = useOptimistic<Note[], Note>(data ?? [], ((prevNotes, nextNotes) => [...prevNotes, nextNotes]));
 
 	const auto = useRef<AutoResizeTextareaHandle | null>(null);
 
@@ -105,8 +204,15 @@ export default function Note() {
 
 	const online = useOnlineStatus();
 
+	
+
+	// function onCreate() {
+	// 	saveNote({text, title});
+	// }
+
+
 	function onCreate() {
-		saveNote({text, title});
+		mutate({ title, content: text, status: 'inprogress', createdAt: new Date() });
 	}
 
 	function onCloseForm() {
@@ -146,16 +252,16 @@ export default function Note() {
 
 		if (state.noteItem) {
 			dispatch({ type: 'CLOSE_MENU' });
-			editNote(state.noteItem.id, title, text);
+			mutateEdit({id: state.noteItem.id, editNote: {title, content: text}});
 		} else {
 			onCreate();
 		}
 		setIsCloseForm();
 	}
 
-	function handleCleanNotes() {
-		clearNotes();
-		// setNote([]);
+	async function handleCleanNotes() {
+		await Promise.all(data.map(note => noteFetchDelete(note.id)));
+		queryClient.invalidateQueries({ queryKey: ['notes'] });
 	}
 
 	function handleClearForm() {
@@ -222,18 +328,17 @@ export default function Note() {
 
 	const onDeleteNote = useCallback((item: Note) => {
 		dispatch({ type: 'CLOSE_MENU' });
-		deleteNote(item.id);
-	},[dispatch, deleteNote]);
-
+		mutateDelete(item.id);
+	},[dispatch, mutateDelete]);
 
 	function onSetStatusCompleted(item: Note) {
 		setStatusCompleted(item.id);
-		dispatch({ type: 'CLOSE_MENU' });
+		mutateStatus({ id: item.id, editNote: { status: 'completed'}});
 	}
 
 	function onSetStatusInprogress(item: Note) {
 		setStatusInprogress(item.id);
-		dispatch({ type: 'CLOSE_MENU' });
+		mutateStatus({ id: item.id, editNote: { status: 'inprogress'}});
 	}
 
 
@@ -279,6 +384,13 @@ export default function Note() {
 		setTheme(theme === 'light' ? 'dark' : 'light');
 	}
 
+	if(isPending) {
+		return <div>Loading notes...</div>;
+	}
+	if(error){
+		return <div>Error server{error.message}</div>;
+	}
+	
 	return (
 		<> 
 			{isOpenForm && <title>{title}</title>}

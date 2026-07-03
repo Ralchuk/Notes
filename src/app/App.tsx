@@ -1,14 +1,18 @@
 import Note from '@/entities/note/note';
 import ThemeComponent from '@/entities/note/theme';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 
 function App() {
 	return (
 		<>
 			<ThemeComponent>
-				<Note/>
+				<QueryClientProvider client={queryClient}>
+					<Note/>
+				</QueryClientProvider>
 			</ThemeComponent>
-			
 		</>
 	);
 }

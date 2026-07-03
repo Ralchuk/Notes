@@ -366,7 +366,7 @@ const SidebarList = () => {
 									<p className={itemNoteContent} dangerouslySetInnerHTML={{ __html: item.parsedContent }}/>
 								</div>
 								<h3 className={itemNoteDate}>
-									{item.createdAt.toLocaleString()}
+									{new Date(item.createdAt).toLocaleString()}
 								</h3>
 							</div>
 						))}
@@ -387,7 +387,7 @@ const SidebarList = () => {
 									<p className={itemNoteContentCompleted} dangerouslySetInnerHTML={{ __html: item.parsedContent }}/>
 								</div>
 								<h3 className={itemNoteDateCompleted}>
-									{item.createdAt.toLocaleString()}
+									{new Date(item.createdAt).toLocaleString()}
 								</h3>
 							</div>
 						))}

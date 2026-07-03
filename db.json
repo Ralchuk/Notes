@@ -1,0 +1,19 @@
+{
+  "notes": [
+    {
+      "title": "980555",
+      "content": "890890",
+      "status": "completed",
+      "createdAt": "2026-07-03T12:20:52.992Z",
+      "id": "vgoEn4rRKRo"
+    },
+    {
+      "title": "3",
+      "content": "123123",
+      "status": "inprogress",
+      "createdAt": "2026-07-03T12:22:59.246Z",
+      "id": "KD0h2sk-zbs"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
