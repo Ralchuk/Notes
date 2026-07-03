@@ -15,7 +15,7 @@ import {
 } from './model/types';
 import { useEffect, useRef, useReducer, useContext, useCallback, useOptimistic} from 'react';
 import useOnlineStatus from '../hooks/useOnlineStatus';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 
 
 // main classes
@@ -182,6 +182,26 @@ export default function Note() {
 			});
 		},
 	});
+
+	const {
+		fetchNextPage,
+		fetchPreviousPage,
+		hasNextPage,
+		hasPreviousPage,
+		isFetchingNextPage,
+		isFetchingPreviousPage,
+		promise,
+		...result
+	} = useInfiniteQuery({
+		queryKey: ['notes'],
+		queryFn: ({ pageParam }) => noteFetch(pageParam),
+		initialPageParam: 1,
+		...options,
+		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
+			lastPage.nextCursor,
+		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) =>
+			firstPage.prevCursor,
+	})
 
 	const {isOpenForm, title, text} = useReduceNoteForm();
 	const {isOpenUserProfile} = useReduceProfile();
