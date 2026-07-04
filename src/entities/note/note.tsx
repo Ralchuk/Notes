@@ -15,7 +15,7 @@ import {
 } from './model/types';
 import { useEffect, useRef, useReducer, useContext, useCallback, useOptimistic} from 'react';
 import useOnlineStatus from '../hooks/useOnlineStatus';
-import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 
 
 // main classes
@@ -42,6 +42,11 @@ const arrEmptyText = 'font-[Roboto, sans-serif] font-medium text-[18px] absolute
 const Empty_note_round = 'flex w-[300px] h-[300px] rounded-full relative bg-gray-300 -z-1 ';
 const arrEmptySvg ='grayscale absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2';
 
+interface NotesPage {
+  data: Note[];
+  next: number | null;
+  previous: number | null;
+}
 
 // reducer для контекстного меню
 
@@ -79,13 +84,15 @@ function reducer(state: MenuState, action: MenuAction): MenuState {
 	}
 };
 
-
-
-const noteFetch = async() => {
-	const response = await fetch('http://localhost:3000/notes');
+const fetchNotesInfinite = async({pageParam = 1}: {pageParam?: number}): Promise<NotesPage> => {
+	const response = await fetch(`http://localhost:3000/notes?_page=${pageParam}&_per_page=5`);
 	if(!response.ok)
 		throw new Error('invalid note');
-	return response.json();
+	const json = await response.json();
+	if (Array.isArray(json)) {
+		return { data: json, next: null, previous: null };
+	}
+	return json;
 };
 
 const noteFetchSave = async(newNote: {title: string, content: string, status: 'inprogress' | 'completed', createdAt: Date}) => {
@@ -136,12 +143,19 @@ export default function Note() {
 
 	const queryClient = useQueryClient();
 
-	const {data, isPending, error} = useQuery({
+	const {
+		data: notesData,
+		isPending,
+		error,
+		fetchNextPage,
+		hasNextPage,
+		isFetchingNextPage
+	} = useInfiniteQuery({
 		queryKey: ['notes'],
-		queryFn:() => noteFetch()
+		queryFn: fetchNotesInfinite,
+		initialPageParam: 1,
+		getNextPageParam: (lastPage) => lastPage.next ?? undefined
 	});
-
-	
 
 	const {mutate} = useMutation({
 		mutationKey: ['new notes'],
@@ -183,26 +197,6 @@ export default function Note() {
 		},
 	});
 
-	const {
-		fetchNextPage,
-		fetchPreviousPage,
-		hasNextPage,
-		hasPreviousPage,
-		isFetchingNextPage,
-		isFetchingPreviousPage,
-		promise,
-		...result
-	} = useInfiniteQuery({
-		queryKey: ['notes'],
-		queryFn: ({ pageParam }) => noteFetch(pageParam),
-		initialPageParam: 1,
-		...options,
-		getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
-			lastPage.nextCursor,
-		getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) =>
-			firstPage.prevCursor,
-	})
-
 	const {isOpenForm, title, text} = useReduceNoteForm();
 	const {isOpenUserProfile} = useReduceProfile();
 	const setIsOpenForm = useReduceNoteForm((state) => state.setIsOpenForm);
@@ -216,20 +210,15 @@ export default function Note() {
 	const setStatusCompleted = useReduceNote((state) => state.setStatusCompleted);
 	const setStatusInprogress = useReduceNote((state) => state.setStatusInprogress);
 
-	const [optimisticNotes, setOptimisticNotes] = useOptimistic<Note[], Note>(data ?? [], ((prevNotes, nextNotes) => [...prevNotes, nextNotes]));
+	const notes = notesData?.pages.flatMap((page) => page.data) ?? [];
+
+	const [optimisticNotes, setOptimisticNotes] = useOptimistic<Note[], Note>(notes, ((prevNotes, nextNotes) => [...prevNotes, nextNotes]));
 
 	const auto = useRef<AutoResizeTextareaHandle | null>(null);
 
 	const [state, dispatch] = useReducer(reducer, initialState);
 
 	const online = useOnlineStatus();
-
-	
-
-	// function onCreate() {
-	// 	saveNote({text, title});
-	// }
-
 
 	function onCreate() {
 		mutate({ title, content: text, status: 'inprogress', createdAt: new Date() });
@@ -280,7 +269,7 @@ export default function Note() {
 	}
 
 	async function handleCleanNotes() {
-		await Promise.all(data.map(note => noteFetchDelete(note.id)));
+		await Promise.all(notes.map(note => noteFetchDelete(note.id)));
 		queryClient.invalidateQueries({ queryKey: ['notes'] });
 	}
 
@@ -290,16 +279,6 @@ export default function Note() {
 	}
 
 	// Контекстне меню
-
-	// function onContextMenu(e: React.MouseEvent<HTMLDivElement>, item: Note){e.preventDefault();
-	// 	dispatch({
-	// 		type: 'OPEN_MENU',
-	// 		payload: {
-	// 			coord: { x: e.clientX, y: e.clientY },
-	// 			noteItem: item,
-	// 		},
-	// 	});
-	// };
 
 
 	const onContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement>, item: Note) => {e.preventDefault();
@@ -312,22 +291,6 @@ export default function Note() {
 		});
 	},[dispatch]);
 
-	
-	// function onEditNote() {
-	// 	dispatch({ type: 'HIDE_MENU' });
-	// 	dispatchNote({ type: 'OPEN_FORM' });
-	// 	if (state.noteItem) {
-	// 		dispatchNote({
-	// 			type: 'SET_TITLE',
-	// 			payload: state.noteItem?.title,
-	// 		});
-	// 		dispatchNote({
-	// 			type: 'SET_TEXT',
-	// 			payload: state.noteItem?.content,
-	// 		});
-	// 	}
-	// }
-
 	const onEditNote = useCallback(() => {
 		dispatch({ type: 'HIDE_MENU' });
 		setIsOpenForm();
@@ -336,15 +299,6 @@ export default function Note() {
 			setText(state.noteItem.content);
 		}
 	}, [dispatch, setIsOpenForm, setTitle, setText, state.noteItem]);
-
-
-	// function onDeleteNote(item: Note) {
-	// 	dispatch({ type: 'CLOSE_MENU' });
-	// 	dispatchNote({
-	// 		type: 'DELETE_NOTE',
-	// 		payload: { id: item.id },
-	// 	});
-	// };
 
 	const onDeleteNote = useCallback((item: Note) => {
 		dispatch({ type: 'CLOSE_MENU' });
@@ -513,6 +467,16 @@ export default function Note() {
 									<img  src={Empty_note} alt='no_notes' width={210} className={arrEmptySvg} />
 									<h2 className={arrEmptyText}>You don't have any notes yet</h2></div>
 							</div>
+						)}
+
+						{hasNextPage && (
+							<button
+								onClick={() => fetchNextPage()}
+								disabled={isFetchingNextPage}
+								className='flex justify-center py-[10px] text-[#1976d3] font-medium disabled:opacity-50 cursor-pointer'
+							>
+								{isFetchingNextPage ? 'Загрузка...' : 'Показать ещё'}
+							</button>
 						)}
 						{state.isOpenMenu && state.coord && state.noteItem ? (
 							<ContextMenu
